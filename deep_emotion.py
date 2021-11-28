@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from dcn import DeformableConv2d
+
 class Deep_Emotion(nn.Module):
     def __init__(self):
         '''
@@ -11,6 +13,10 @@ class Deep_Emotion(nn.Module):
         self.conv1 = nn.Conv2d(1,10,3)
         self.conv2 = nn.Conv2d(10,10,3)
         self.pool2 = nn.MaxPool2d(2,2)
+
+        # replace conv3/4 with deformable convolution
+        self.de_conv3 = DeformableConv2d(in_channels=10, out_channels=10, kernel_size=3, stride=1, padding=0)
+        self.de_conv4 = DeformableConv2d(in_channels=10, out_channels=10, kernel_size=3, stride=1, padding=0)
 
         self.conv3 = nn.Conv2d(10,10,3)
         self.conv4 = nn.Conv2d(10,10,3)
@@ -55,8 +61,8 @@ class Deep_Emotion(nn.Module):
         out = self.conv2(out)
         out = F.relu(self.pool2(out))
 
-        out = F.relu(self.conv3(out))
-        out = self.norm(self.conv4(out))
+        out = F.relu(self.de_conv3(out))
+        out = self.norm(self.de_conv4(out))
         out = F.relu(self.pool4(out))
 
         out = F.dropout(out)
@@ -65,4 +71,3 @@ class Deep_Emotion(nn.Module):
         out = self.fc2(out)
 
         return out
-        
