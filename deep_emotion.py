@@ -11,24 +11,25 @@ class Deep_Emotion(nn.Module):
         input: Nx48x48x1
         '''
         super(Deep_Emotion,self).__init__()
-        self.conv1 = nn.Conv2d(1,32,3)      # 46x46x32
-        self.conv2 = nn.Conv2d(32,64,3)     # 44x44x64
-        self.bn1 = nn.BatchNorm2d(64)     # 18x18x128
+        self.conv1 = nn.Conv2d(1,10,3)      # 46x46x32
+        self.conv2 = nn.Conv2d(10,10,3)     # 44x44x64
+        self.bn1 = nn.BatchNorm2d(10)     # 18x18x128
         self.pool2 = nn.MaxPool2d(2,2)      # 22x22x64
 
         # replace conv3/4 with deformable convolution
         self.de_conv3 = DeformableConv2d(in_channels=10, out_channels=10, kernel_size=3, stride=1, padding=0)
         self.de_conv4 = DeformableConv2d(in_channels=10, out_channels=10, kernel_size=3, stride=1, padding=0)
 
-        self.conv3 = nn.Conv2d(64,128,3)    # 20x20x128
-        self.conv4 = nn.Conv2d(128,128,3)   # 18x18x128
-        self.bn2 = nn.BatchNorm2d(128)     # 18x18x128
+        self.conv3 = nn.Conv2d(10,10,3)    # 20x20x128
+        self.conv4 = nn.Conv2d(10,10,3)   # 18x18x128
+        self.bn2 = nn.BatchNorm2d(10)     # 18x18x128
         self.pool4 = nn.MaxPool2d(2,2)
 
         # self.bn2 = nn.BatchNorm2d(128)     # 18x18x128
 
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(9 * 9 * 128, 50)        # 
+        # self.fc1 = nn.Linear(9 * 9 * 128, 50)        # 
+        self.fc1 = nn.Linear(810, 50)        # 
         self.fc2 = nn.Linear(50,7)
 
         # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
