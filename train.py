@@ -108,7 +108,7 @@ if __name__ == '__main__':
         val_loader=   DataLoader(validation_dataset,batch_size=batchsize,shuffle = True,num_workers=0)
 
         criterion= nn.CrossEntropyLoss()
-        optmizer= optim.Adam(net.parameters(),lr= lr)
+        optmizer= optim.Adam(net.parameters(),lr=lr,weight_decay=1e-4)
         Train(epochs, train_loader, val_loader, criterion, optmizer, device)
 
     if args.show:
