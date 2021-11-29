@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from dataloaders.fer2013 import Plain_Dataset, eval_data_dataloader, Generate_data
 from deep_emotion import Deep_Emotion
+from vgg import Vgg
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -91,7 +92,8 @@ if __name__ == '__main__':
         batchsize = 128
 
     if args.train:
-        net = Deep_Emotion()
+        # net = Deep_Emotion()
+        net = Vgg()
         net.to(device)
         print("Model archticture: ", net)
         from torchinfo import summary
