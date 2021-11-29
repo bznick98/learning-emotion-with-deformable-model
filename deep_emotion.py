@@ -13,6 +13,7 @@ class Deep_Emotion(nn.Module):
         super(Deep_Emotion,self).__init__()
         self.conv1 = nn.Conv2d(1,32,3)      # 46x46x32
         self.conv2 = nn.Conv2d(32,64,3)     # 44x44x64
+        self.bn1 = nn.BatchNorm2d(64)     # 18x18x128
         self.pool2 = nn.MaxPool2d(2,2)      # 22x22x64
 
         # replace conv3/4 with deformable convolution
@@ -21,9 +22,10 @@ class Deep_Emotion(nn.Module):
 
         self.conv3 = nn.Conv2d(64,128,3)    # 20x20x128
         self.conv4 = nn.Conv2d(128,128,3)   # 18x18x128
+        self.bn2 = nn.BatchNorm2d(128)     # 18x18x128
         self.pool4 = nn.MaxPool2d(2,2)
 
-        self.norm = nn.BatchNorm2d(128)     # 18x18x128
+        # self.bn2 = nn.BatchNorm2d(128)     # 18x18x128
 
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(9 * 9 * 128, 50)        # 
@@ -64,10 +66,11 @@ class Deep_Emotion(nn.Module):
 
         out = F.relu(self.conv1(out))
         out = self.conv2(out)
+        out = self.bn1(out)
         out = F.relu(self.pool2(out))
 
         out = F.relu(self.conv3(out))
-        out = self.norm(self.conv4(out))
+        out = self.bn2(self.conv4(out))
         out = F.relu(self.pool4(out))
 
         out = F.dropout(out)
