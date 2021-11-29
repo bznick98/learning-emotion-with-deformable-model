@@ -74,6 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('-lr', '--learning_rate', type= float, help= 'value of learning rate')
     parser.add_argument('-bs', '--batch_size', type= int, help= 'training/validation batch size')
     parser.add_argument('-t', '--train', type=bool, help='True when training')
+    parser.add_argument('--show', action='store_true', help='Show 1 training sample.')
     args = parser.parse_args()
 
     if args.setup :
@@ -93,6 +94,8 @@ if __name__ == '__main__':
         net = Deep_Emotion()
         net.to(device)
         print("Model archticture: ", net)
+        from torchinfo import summary
+        summary(net, input_size=(batchsize, 1, 48, 48))
         traincsv_file = args.data+'/'+'train.csv'
         validationcsv_file = args.data+'/'+'val.csv'
         train_img_dir = args.data+'/'+'train/'
@@ -107,4 +110,12 @@ if __name__ == '__main__':
         criterion= nn.CrossEntropyLoss()
         optmizer= optim.Adam(net.parameters(),lr= lr)
         Train(epochs, train_loader, val_loader, criterion, optmizer, device)
+
+    if args.show:
+        train_img_dir = args.data+'/'+'train/'
+        traincsv_file = args.data+'/'+'train.csv'
+        train_dataset= Plain_Dataset(csv_file=traincsv_file, img_dir = train_img_dir, datatype = 'train',  transform=None)
+        print("Showing sample image.")
+        train_dataset.show()
+        print("===\n0=Angry, 1=Disgust, 2=Fear, 3=Happy, 4=Sad, 5=Surprise, 6=Neutral\n===")
 

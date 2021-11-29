@@ -29,6 +29,13 @@ class Plain_Dataset(Dataset):
         self.transform = transform
         self.datatype = datatype
 
+    def show(self):
+        idx = np.random.randint(0, len(self.csv_file))
+        img = Image.open(self.img_dir+self.datatype+str(idx)+'.jpg')
+        labels = torch.from_numpy(np.array(self.labels[idx])).long()
+        img.show(title=f"{labels}")
+        print("Label = ", labels)
+
     def __len__(self):
         return len(self.csv_file)
 
