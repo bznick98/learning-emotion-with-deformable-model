@@ -21,16 +21,16 @@ class Deep_Emotion(nn.Module):
         self.de_conv3 = DeformableConv2d(in_channels=10, out_channels=10, kernel_size=3, stride=1, padding=0)
         self.de_conv4 = DeformableConv2d(in_channels=10, out_channels=10, kernel_size=3, stride=1, padding=0)
 
-        self.conv3 = nn.Conv2d(32,32,3)    # 20x20x32
-        self.bn3 = nn.BatchNorm2d(32) 
-        self.conv4 = nn.Conv2d(32,32,3)    # 18x18x32
-        self.bn4 = nn.BatchNorm2d(32)  
+        self.conv3 = nn.Conv2d(32,64,3)    # 20x20x32
+        self.bn3 = nn.BatchNorm2d(64) 
+        self.conv4 = nn.Conv2d(64,64,3)    # 18x18x32
+        self.bn4 = nn.BatchNorm2d(64)  
         self.pool4 = nn.MaxPool2d(2,2)     # 9x9x32
 
         # self.bn2 = nn.BatchNorm2d(128)   
 
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(9 * 9 * 32, 50)        # 
+        self.fc1 = nn.Linear(9 * 9 * 64, 50)        # 
         # self.fc1 = nn.Linear(810, 50)        # 
         self.bn5 = nn.BatchNorm1d(50)
         self.fc2 = nn.Linear(50,7)
