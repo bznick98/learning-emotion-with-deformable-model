@@ -61,8 +61,6 @@ class Deep_Emotion(nn.Module):
 
     def forward(self,input):
         out = self.stn(input)
-        print("--------------=-=-=-=-=-=-=-=---------")
-        print(out.shape)
 
         out = F.relu(self.conv1(out))
         out = self.conv2(out)
@@ -75,8 +73,6 @@ class Deep_Emotion(nn.Module):
         out = F.dropout(out)
         # out = out.view(-1, 1327104)
         out = self.flatten(out)
-        print("==================================")
-        print(out.shape)
         out = F.relu(self.fc1(out))
         out = self.fc2(out)
 
