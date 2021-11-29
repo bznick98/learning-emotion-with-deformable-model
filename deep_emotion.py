@@ -27,7 +27,7 @@ class Deep_Emotion(nn.Module):
         self.bn4 = nn.BatchNorm2d(32)  
         self.pool4 = nn.MaxPool2d(2,2)     # 9x9x32
 
-        # self.bn2 = nn.BatchNorm2d(128)     # 18x18x128
+        # self.bn2 = nn.BatchNorm2d(128)   
 
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(9 * 9 * 32, 50)        # 
@@ -69,18 +69,21 @@ class Deep_Emotion(nn.Module):
         out = self.stn(input)
 
         out = F.relu(self.conv1(out))
-        out = self.conv2(out)
         out = self.bn1(out)
+        out = self.conv2(out)
+        out = self.bn2(out)
         out = F.relu(self.pool2(out))
 
         out = F.relu(self.conv3(out))
-        out = self.bn2(self.conv4(out))
+        out = self.bn3(out)
+        out = self.bn4(self.conv4(out))
         out = F.relu(self.pool4(out))
 
         out = F.dropout(out)
         # out = out.view(-1, 1327104)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
+        out = self.bn5(out)
         out = self.fc2(out)
 
         return out
