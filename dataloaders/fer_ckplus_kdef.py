@@ -75,6 +75,8 @@ class FER_CKPLUS_Dataloader:
             num_workers = num_workers
         )
 
+        self.val_loader = None
+
 
 
 

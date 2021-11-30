@@ -77,10 +77,14 @@ def Train(epochs, train_loader, val_loader, criterion, optmizer, device):
             _, val_preds = torch.max(val_outputs,1)
             val_correct += torch.sum(val_preds == labels.data)
 
-        train_loss = train_loss/len(train_dataset)
-        train_acc = train_correct.double() / len(train_dataset)
-        validation_loss =  validation_loss / len(validation_dataset)
-        val_acc = val_correct.double() / len(validation_dataset)
+        train_loss = train_loss/ dl.train_len
+        train_acc = train_correct.double() / dl.train_len
+        if val_loader:
+          validation_loss =  validation_loss / dl.val_len
+          val_acc = val_correct.double() / dl.val_len
+        else:
+          validation_loss = "No val"
+          val_acc = 0
         print('Epoch: {} \tTraining Loss: {:.8f} \tValidation Loss {:.8f} \tTraining Acuuarcy {:.3f}% \tValidation Acuuarcy {:.3f}%'
                                                            .format(e+1, train_loss,validation_loss,train_acc * 100, val_acc*100))
 
