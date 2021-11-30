@@ -147,7 +147,7 @@ class FER2013_Dataloader:
         FER2013: 48x48 grayscale images
         """
         if gen_data:
-            Generate_data()
+            Generate_data(data_dir)
             
         self.transform = transforms.Compose([
             transforms.ToTensor(),
