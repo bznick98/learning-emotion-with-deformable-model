@@ -1,2 +1,5 @@
 **/*.csv
 data/*
+**/.DS_Store
+**/*.pyc
+**/*.pt
