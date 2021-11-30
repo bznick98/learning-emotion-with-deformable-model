@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 
 class Plain_Dataset(Dataset):
-    def __init__(self, img_dir, transform=None):
+    def __init__(self, img_dir, transform=None, **kargs):
         '''
         Pytorch Dataset class
         params:-
@@ -20,6 +20,7 @@ class Plain_Dataset(Dataset):
         return :-
                  image, labels
         '''
+        self.transform = transform
         self.label_names = {
             "anger": 0,
             "disgust": 1,
@@ -29,21 +30,20 @@ class Plain_Dataset(Dataset):
             "surprise": 5,
             "neutrality": 6
         }
-        self.imgs = np.array([])
-        self.labels = np.array([])
+        self.imgs = []
+        self.labels = []
         # read all subdirectories
         dirs = os.listdir(img_dir)
-        print(dirs)
         for dir in dirs:
             if dir not in self.label_names: continue
             curr_label = self.label_names[dir]
             for file in tqdm(os.listdir(img_dir + "/" + dir)):
-                img = Image.open(img_dir + "/" + dir + "/" + file)
-                self.imgs.append(img)
-                self.labels.append(curr_label)
+                with Image.open(img_dir + "/" + dir + "/" + file) as img:
+                    self.imgs.append(np.array(img))
+                    self.labels.append(curr_label)
                 
         print("LOADED!")
-        print(self.imgs.shape)
+        print(len(self.imgs))
         print(len(self.labels))
 
     def show(self):
@@ -55,7 +55,7 @@ class Plain_Dataset(Dataset):
     def __getitem__(self, idx):
         img = self.imgs[idx]
         label = self.labels[idx]
-        if self.transform :
+        if self.transform:
             img = self.transform(img)
         return img ,label
 

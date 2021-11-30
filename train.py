@@ -12,8 +12,9 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
 from tqdm import tqdm
 
-from dataloaders.fer2013 import Plain_Dataset, eval_data_dataloader, Generate_data
-from deep_emotion import Deep_Emotion
+# from dataloaders.fer2013 import Plain_Dataset, eval_data_dataloader, Generate_data
+from dataloaders.fer_ckplus import Plain_Dataset
+from deep_emotion import Deep_Emotion, Deep_Emotion_FERCKPLUS
 from vgg import Vgg
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -92,26 +93,49 @@ if __name__ == '__main__':
         batchsize = 128
 
     if args.train:
-        # net = Deep_Emotion()
-        net = Vgg()
+        net = Deep_Emotion_FERCKPLUS()
+        # net = Vgg()
         net.to(device)
         print("Model archticture: ", net)
         from torchinfo import summary
-        summary(net, input_size=(batchsize, 1, 48, 48))
-        traincsv_file = args.data+'/'+'train.csv'
-        validationcsv_file = args.data+'/'+'val.csv'
-        train_img_dir = args.data+'/'+'train/'
-        validation_img_dir = args.data+'/'+'val/'
 
-        transformation= transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,),(0.5,))])
-        train_dataset= Plain_Dataset(csv_file=traincsv_file, img_dir = train_img_dir, datatype = 'train', transform = transformation)
-        validation_dataset= Plain_Dataset(csv_file=validationcsv_file, img_dir = validation_img_dir, datatype = 'val', transform = transformation)
-        train_loader= DataLoader(train_dataset,batch_size=batchsize,shuffle = True,num_workers=0)
-        val_loader=   DataLoader(validation_dataset,batch_size=batchsize,shuffle = True,num_workers=0)
+
+
+        if args.data == "FER2013": # FER2013
+            transformation= transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,),(0.5,))
+            ])
+            args.data = "data"
+            traincsv_file = args.data+'/'+'train.csv'
+            validationcsv_file = args.data+'/'+'val.csv'
+            train_img_dir = args.data+'/'+'train/'
+            validation_img_dir = args.data+'/'+'val/'
+
+            train_dataset = Plain_Dataset(csv_file=traincsv_file, img_dir = train_img_dir, datatype = 'train', transform = transformation)
+            validation_dataset = Plain_Dataset(csv_file=validationcsv_file, img_dir = validation_img_dir, datatype = 'val', transform = transformation)
+            train_loader = DataLoader(train_dataset,batch_size=batchsize,shuffle = True,num_workers=0)
+            val_loader = DataLoader(validation_dataset,batch_size=batchsize,shuffle = True,num_workers=0)
+            summary(net, input_size=(batchsize, 1, 48, 48))
+        elif args.data == "FER_CK": # FER_CKPLUS
+            transformation= transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,),(0.5,)),
+                transforms.Resize((128, 128))
+            ])
+            args.data = "data/fer_ckplus_kdef/"
+            train_img_dir = args.data
+            train_dataset= Plain_Dataset(img_dir = train_img_dir, datatype = 'train', transform = transformation)
+            # validation_dataset= Plain_Dataset(img_dir = validation_img_dir, datatype = 'val', transform = transformation)
+            train_loader = DataLoader(train_dataset,batch_size=batchsize,shuffle = True,num_workers=4)
+            summary(net, input_size=(batchsize, 1, 128, 128))
+
+        else:
+            raise Exception("args.data can only be \{FER2013, FER_CK\}")
 
         criterion= nn.CrossEntropyLoss()
         optmizer= optim.Adam(net.parameters(),lr=lr,weight_decay=1e-4)
-        Train(epochs, train_loader, val_loader, criterion, optmizer, device)
+        Train(epochs, train_loader, None, criterion, optmizer, device)
 
     if args.show:
         train_img_dir = args.data+'/'+'train/'
