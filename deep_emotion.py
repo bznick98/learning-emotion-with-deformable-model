@@ -31,7 +31,7 @@ class Deep_Emotion(nn.Module):
         # self.conv5 = nn.Conv2d(64,128,3)    # 8x8x128
         # self.bn5 = nn.BatchNorm2d(128)  
 
-        # self.conv6 = nn.Conv2d(128,256,3)    # 6x6x256
+        # self.conv6 = nn.Conv2d(128,256,3)   # 6x6x256
         # self.bn6 = nn.BatchNorm2d(256)
 
         # self.bn2 = nn.BatchNorm2d(128)   
