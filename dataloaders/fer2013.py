@@ -159,16 +159,26 @@ class FER2013_Dataloader:
         train_img_dir = data_dir + 'train/'
         validation_img_dir = data_dir + 'val/'
 
+        train_ds = FER2013_Dataset(train_csv_file, train_img_dir, "train", self.transform)
+        self.train_len = len(train_ds)
         self.train_loader = DataLoader(
-            FER2013_Dataset(train_csv_file, train_img_dir, "train", self.transform),
+            train_ds,
             batch_size = batchsize,
             shuffle = True,
             num_workers = num_workers
         )
 
+        val_ds = FER2013_Dataset(validation_csv_file, validation_img_dir, "val", self.transform)
+        self.val_len = len(val_ds)
         self.val_loader = DataLoader(
-            FER2013_Dataset(validation_csv_file, validation_img_dir, "val", self.transform),
+            val_ds,
             batch_size = batchsize,
             shuffle = False,
             num_workers = num_workers
         )
+
+
+if __name__ == "__main__":
+    # ONLY FOR TESTING
+    dl = FER2013_Dataloader()
+    print(dl.train_len, dl.val_len)
