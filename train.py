@@ -23,13 +23,12 @@ parser = argparse.ArgumentParser(description="Configuration of setup and trainin
 parser.add_argument('-s', '--setup', action='store_true', help='setup the dataset for the first time')
 parser.add_argument('-d', '--data', type=str, default='data/',
                             help='data folder that contains data files that downloaded from kaggle (icml_face_data.csv)')
+parser.add_argument('--model', type=str, default='de', help='DL model to run, can be one of {de, vgg}')
 parser.add_argument('-e', '--epochs', type=int, default=100, help= 'number of epochs')
 parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001, help='value of learning rate')
 parser.add_argument('-bs', '--batch_size', type=int, default=128, help='training/validation batch size')
 parser.add_argument('-wd', '--weight_decay', type=float, default=1e-4, help='weight decay coeff(L2 regularization)')
 parser.add_argument('--show', action='store_true', help='Show 1 training sample.')
-parser.add_argument('--model', type=str, default='de',
-                            help='DL model to run, can be one of {de, vgg}')
 args = parser.parse_args()  
 
 # cpu/gpu device setup
