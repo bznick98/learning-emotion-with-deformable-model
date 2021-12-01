@@ -68,13 +68,16 @@ class FER_CKPLUS_Dataloader:
             transforms.Resize(resize)
         ])
         
+        train_ds = FER_CKPLUS_Dataset(data_dir, self.transform)
+        self.train_len = len(train_ds)
         self.train_loader = DataLoader(
-            FER_CKPLUS_Dataset(data_dir, self.transform),
+            train_ds,
             batch_size = batchsize,
             shuffle = True,
             num_workers = num_workers
         )
 
+        self.val_len = 0
         self.val_loader = None
 
 
