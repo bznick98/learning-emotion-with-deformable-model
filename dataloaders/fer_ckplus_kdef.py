@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 import torch
 import torchvision
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
 from tqdm import tqdm
 
@@ -68,7 +68,13 @@ class FER_CKPLUS_Dataloader:
             transforms.Resize(resize)
         ])
         
-        train_ds = FER_CKPLUS_Dataset(data_dir, self.transform)
+        ds = FER_CKPLUS_Dataset(data_dir, self.transform)
+        train_val_split_ratio = 0.1
+        train_num = int(len(ds)*train_val_split_ratio)
+        val_num = len(ds) - train_num
+        train_ds, val_ds = random_split(ds, [train_num, val_num])
+
+        # train loader
         self.train_len = len(train_ds)
         self.train_loader = DataLoader(
             train_ds,
@@ -77,9 +83,14 @@ class FER_CKPLUS_Dataloader:
             num_workers = num_workers
         )
 
-        self.val_len = 0
-        self.val_loader = None
-
+        # validation loader
+        self.val_len = len(val_ds)
+        self.val_loader = DataLoader(
+            val_ds,
+            batch_size = batchsize,
+            shuffle = True,
+            num_workers = num_workers
+        )
 
 
 
@@ -87,3 +98,4 @@ class FER_CKPLUS_Dataloader:
 if __name__ == "__main__":
     test_dataset = FER_CKPLUS_Dataset("data/fer_ckplus_kdef")
     test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0)
+    
