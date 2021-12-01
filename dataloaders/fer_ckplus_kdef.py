@@ -69,7 +69,7 @@ class FER_CKPLUS_Dataloader:
         ])
         
         ds = FER_CKPLUS_Dataset(data_dir, self.transform)
-        train_val_split_ratio = 0.1
+        train_val_split_ratio = 0.9
         train_num = int(len(ds)*train_val_split_ratio)
         val_num = len(ds) - train_num
         train_ds, val_ds = random_split(ds, [train_num, val_num])
@@ -98,4 +98,3 @@ class FER_CKPLUS_Dataloader:
 if __name__ == "__main__":
     test_dataset = FER_CKPLUS_Dataset("data/fer_ckplus_kdef")
     test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0)
-    
