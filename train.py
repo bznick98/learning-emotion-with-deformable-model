@@ -43,11 +43,14 @@ if device.type == 'cuda':
     print('Cached:   ', round(torch.cuda.memory_reserved(0)/1024**3,1), 'GB')
 
 
-def Train(epochs, train_loader, val_loader, criterion, optmizer, device):
+def Train(epochs, dl, criterion, optmizer, device):
     '''
     Training Loop
     '''
     print("===================================Start Training===================================")
+    train_loader = dl.train_loader
+    val_loader = dl.val_loader
+
     for e in range(epochs):
         train_loss = 0
         validation_loss = 0
@@ -79,12 +82,9 @@ def Train(epochs, train_loader, val_loader, criterion, optmizer, device):
 
         train_loss = train_loss/ dl.train_len
         train_acc = train_correct.double() / dl.train_len
-        if val_loader:
-          validation_loss =  validation_loss / dl.val_len
-          val_acc = val_correct.double() / dl.val_len
-        else:
-          validation_loss = "No val"
-          val_acc = 0
+        validation_loss =  validation_loss / dl.val_len
+        val_acc = val_correct.double() / dl.val_len
+
         print('Epoch: {} \tTraining Loss: {:.8f} \tValidation Loss {:.8f} \tTraining Acuuarcy {:.3f}% \tValidation Acuuarcy {:.3f}%'
                                                            .format(e+1, train_loss,validation_loss,train_acc * 100, val_acc*100))
 
@@ -127,3 +127,5 @@ if __name__ == '__main__':
     # Optimizer
     optmizer = optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
     Train(epochs, train_loader, val_loader, criterion, optmizer, device)
+
+
