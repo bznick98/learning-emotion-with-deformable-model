@@ -64,8 +64,8 @@ class FER_CKPLUS_Dataset(Dataset):
         read h5 file into self.imgs and self.labels
         """
         with h5py.File(filepath, 'r') as hf:
-            self.imgs = torch.Tensor(hf['imgs'][:])
-            self.labels = torch.Tensor(hf['labels'][:])
+            self.imgs = hf['imgs'][:]
+            self.labels = hf['labels'][:]
             print(type(self.imgs), type(self.labels))
 
     def __len__(self):
@@ -81,7 +81,7 @@ class FER_CKPLUS_Dataset(Dataset):
         
 
 class FER_CKPLUS_Dataloader:
-    def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=(128,128), augment=True):
+    def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=(128,128), augment=True, h5_path=None):
         """
         generate train loader
         """
@@ -99,7 +99,7 @@ class FER_CKPLUS_Dataloader:
                 transforms.Resize(resize)
             ])
         
-        ds = FER_CKPLUS_Dataset(data_dir, self.transform)
+        ds = FER_CKPLUS_Dataset(data_dir, self.transform, h5_path=h5_path)
         train_val_split_ratio = 0.9
         train_num = int(len(ds)*train_val_split_ratio)
         val_num = len(ds) - train_num
