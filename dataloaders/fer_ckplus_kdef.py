@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 
 class FER_CKPLUS_Dataset(Dataset):
-    def __init__(self, img_dir, transform=None, **kargs):
+    def __init__(self, img_dir, transform=None, is_train=True, **kargs):
         '''
         Pytorch Dataset class
         params:-
@@ -20,6 +20,7 @@ class FER_CKPLUS_Dataset(Dataset):
         return :-
                  image, labels
         '''
+        self.is_train = is_train
         self.transform = transform
         self.label_names = {
             "anger": 0,
@@ -51,7 +52,7 @@ class FER_CKPLUS_Dataset(Dataset):
     def __getitem__(self, idx):
         img = self.imgs[idx]
         label = self.labels[idx]
-        if self.transform:
+        if self.transform and self.is_train:
             img = self.transform(img)
         return img ,label
 
@@ -81,6 +82,8 @@ class FER_CKPLUS_Dataloader:
         train_num = int(len(ds)*train_val_split_ratio)
         val_num = len(ds) - train_num
         train_ds, val_ds = random_split(ds, [train_num, val_num])
+        # not augment validation set
+        val_ds.is_train = False
 
         # train loader
         self.train_len = len(train_ds)
