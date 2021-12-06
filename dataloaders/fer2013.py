@@ -154,10 +154,10 @@ class FER2013_Dataloader:
             transforms.Normalize((0.5,),(0.5,)),
         ])
 
-        train_csv_file = data_dir +'train.csv'
-        validation_csv_file = data_dir + 'val.csv'
-        train_img_dir = data_dir + 'train/'
-        validation_img_dir = data_dir + 'val/'
+        train_csv_file = data_dir +'/train.csv'
+        validation_csv_file = data_dir + '/val.csv'
+        train_img_dir = data_dir + '/train/'
+        validation_img_dir = data_dir + '/val/'
 
         train_ds = FER2013_Dataset(train_csv_file, train_img_dir, "train", self.transform)
         self.train_len = len(train_ds)
