@@ -103,3 +103,34 @@ def Train(epochs, data_loader, criterion, optmizer, device):
     torch.save(net.state_dict(),'deep_emotion-{}-{}-{}.pt'.format(epochs,batchsize,lr))
     print("===================================Training Finished===================================")
     return train_loss_arr, train_acc_arr, val_loss_arr, val_acc_arr
+
+
+if __name__ == "__main__":
+    # Choosing model
+    if args.model == 'de':
+        net = Deep_Emotion(wider=False, deeper=False, de_conv=False)
+    elif args.model == 'vgg':
+        net = Vgg()
+    else:
+        raise Exception("--model can only accpet one of \{de, vgg\}")
+    net.to(device)
+
+    # Choosing dataset
+    if args.data == "FER2013": # FER2013
+        summary(net, input_size=(args.batchsize, 1, 48, 48), verbose=1)
+        dl = FER2013_Dataloader(data_dir="./data/fer2013", gen_data=args.setup, batchsize=args.batchsize)
+    elif args.data == "FER_CKPLUS": # FER_CKPLUS
+        dl = FER_CKPLUS_Dataloader(data_dir="./data/fer_ckplus_kdef/", resize=(48,48), augment=True, batchsize=args.batchsize, h5_path="/content/gdrive/MyDrive/FER_CKPLUS/fer_ckplus.h5")
+        summary(net, input_size=(args.batchsize, 1, 48, 48), verbose=1)
+    elif args.data == "CK_PLUS":
+        dl = FER_CKPLUS_Dataloader(data_dir="./data/CK_PLUS/", resize=(48,48), augment=True, batchsize=args.batchsize)
+        summary(net, input_size=(args.batchsize, 1, 48, 48), verbose=1)
+    else:
+        raise Exception("-d or --data can only be \{FER2013, FER_CK\}")
+
+    # Loss
+    criterion = nn.CrossEntropyLoss()
+    # Optimizer
+    optmizer = optim.Adam(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    history = Train(args.epochs, dl, criterion, optmizer, device)
+    
