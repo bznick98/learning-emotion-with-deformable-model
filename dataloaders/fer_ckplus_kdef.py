@@ -32,7 +32,7 @@ class FER_CKPLUS_Dataset(Dataset):
             "neutrality": 6
         }
         # either read from h5 file or read from image subdirectories
-        if h5_path and os.path.exists(h5_path):
+        if h5_path:
             print(f"Reading from h5 file: {h5_path}")
             self.read_h5(filepath=h5_path)
         else:
@@ -131,6 +131,6 @@ class FER_CKPLUS_Dataloader:
 
 
 if __name__ == "__main__":
-    dataset = FER_CKPLUS_Dataset("data/fer_ckplus_kdef", h5_path="./data/fer_ckplus.h5")
-    # test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0)
+    dl = FER_CKPLUS_Dataloader("data/fer_ckplus_kdef", h5_path="./data/fer_ckplus.h5")
+    # test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0, h5_path="./data/fer_ckplus.h5")
     # dataset.save_h5(save_dir="./data/", data_name="fer_ckplus")
