@@ -58,15 +58,23 @@ class FER_CKPLUS_Dataset(Dataset):
         
 
 class FER_CKPLUS_Dataloader:
-    def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=(128,128)):
+    def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=(128,128), augment=True):
         """
         generate train loader
         """
-        self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5,),(0.5,)),
-            transforms.Resize(resize)
-        ])
+        if not augment:
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,),(0.5,)),
+                transforms.Resize(resize)
+            ])
+        else:
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,),(0.5,)),
+                transforms.RandomHorizontalFlip(),
+                transforms.Resize(resize)
+            ])
         
         ds = FER_CKPLUS_Dataset(data_dir, self.transform)
         train_val_split_ratio = 0.9

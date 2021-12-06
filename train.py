@@ -119,6 +119,11 @@ if __name__ == '__main__':
         train_loader = dl.train_loader
         val_loader = None
         summary(net, input_size=(batchsize, 1, 48, 48))
+    elif args.data == "CK_PLUS":
+        dl = FER_CKPLUS_Dataloader(data_dir="data/CK_PLUS/")
+        train_loader = dl.train_loader
+        val_loader = None
+        summary(net, input_size=(batchsize, 1, 48, 48))
     else:
         raise Exception("-d or --data can only be \{FER2013, FER_CK\}")
 
