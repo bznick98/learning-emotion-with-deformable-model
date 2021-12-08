@@ -69,7 +69,7 @@ class FER_CKPLUS_Dataset(Dataset):
             print(len(self.imgs.shape))
             if len(self.imgs.shape) == 3:
                 # extend channel
-                self.img = self.imgs[:, np.newaxis, ...]
+                self.imgs = self.imgs[:, np.newaxis, ...]
             print("=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
             print("=-=-=-=-=-=-=-=-==-=-SHAPE CHECK-=-=-=-=-=-=-=-=-=-=-=-=-=")
             print("=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
