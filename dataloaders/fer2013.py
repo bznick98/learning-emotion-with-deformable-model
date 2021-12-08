@@ -193,16 +193,17 @@ class FER2013_Dataloader:
             Generate_data(data_dir, h5_path)
 
         # process image pre-process and augment
-        transform_list = [
-            transforms.ToTensor(),
-            transforms.Normalize((0.5,),(0.5,)),
-        ]
+        transform_list = []
         if transform:
             transform_list.extend(transform)
         if augment:
             transform_list.extend([
                 transforms.RandomHorizontalFlip(),
             ])
+        transform_list.extend([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,),(0.5,)),
+        ])
         self.transform = transforms.Compose(transform_list)
 
 
