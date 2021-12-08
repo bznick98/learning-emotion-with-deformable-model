@@ -100,7 +100,7 @@ class FER_CKPLUS_Dataset(Dataset):
         
 
 class FER_CKPLUS_Dataloader:
-    def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=(128,128), augment=True, h5_path=None):
+    def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=(128,128), augment=True, h5_path=None, train_val_split=0.9):
         """
         generate train loader
         """
@@ -119,8 +119,7 @@ class FER_CKPLUS_Dataloader:
             ])
         
         ds = FER_CKPLUS_Dataset(data_dir, self.transform, h5_path=h5_path)
-        train_val_split_ratio = 0.9
-        train_num = int(len(ds)*train_val_split_ratio)
+        train_num = int(len(ds)*train_val_split) # default=0.9
         val_num = len(ds) - train_num
         train_ds, val_ds = random_split(ds, [train_num, val_num])
         # not augment validation set
@@ -150,6 +149,7 @@ class FER_CKPLUS_Dataloader:
 
 
 if __name__ == "__main__":
-    dl = FER_CKPLUS_Dataloader("data/CK_PLUS_256")
+    dl = FER_CKPLUS_Dataloader("data/CK_PLUS")
     # test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0, h5_path="./data/fer_ckplus.h5")
-    # dataset.save_h5(save_dir="./data/", data_name="fer_ckplus")
+    dataset = FER_CKPLUS_Dataset("data/CK_PLUS")
+    dataset.save_h5(save_dir="./data/", data_name="CK_PLUS")
