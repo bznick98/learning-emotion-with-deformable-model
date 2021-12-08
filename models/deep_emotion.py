@@ -130,14 +130,13 @@ class Deep_Emotion(nn.Module):
 
 
 class Deep_Emotion224(nn.Module):
-    def __init__(self, wider=False, deeper=False, de_conv=False):
+    def __init__(self, de_conv=False):
         '''
         Deep_Emotion (wider)
         input: Nx1x224x224
         '''
-        super(Deep_Emotion,self).__init__()
-        self.wider = wider
-        self.deeper = deeper
+        super().__init__()
+
         self.de_conv = de_conv
 
         self.conv1 = nn.Conv2d(1,32,3)      # 222x222x32
