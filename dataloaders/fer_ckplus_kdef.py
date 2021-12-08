@@ -11,7 +11,7 @@ from tqdm import tqdm
 import h5py
 
 class FER_CKPLUS_Dataset(Dataset):
-    def __init__(self, img_dir, transform=None, is_train=True, h5_path=None, **kargs):
+    def __init__(self, img_dir, transform=None, is_train=True, h5_path=None, resize=None, augment=False, **kargs):
         '''
         Pytorch Dataset class
         params:-
@@ -20,6 +20,22 @@ class FER_CKPLUS_Dataset(Dataset):
         return :-
                  image, labels
         '''
+        # process transform
+        transform_list = [
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,),(0.5,)),
+        ]
+        if transform:
+            transform_list.extend(transform)
+        if augment:
+            transform_list.extend([
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomCrop((224, 224))
+            ])
+        if resize:
+            transform_list.append(transforms.Resize(resize))
+        
+        self.transform = transforms.Compose(transform_list)
         self.is_train = is_train
         self.transform = transform
         self.label_names = {
@@ -103,24 +119,8 @@ class FER_CKPLUS_Dataloader:
     def __init__(self, data_dir="data/fer_ckplus_kdef/", batchsize=128, num_workers=4, resize=None, augment=True, h5_path=None, train_val_split=0.9, transform=None):
         """
         generate train loader
-        """
-        transform_list = [
-            transforms.ToTensor(),
-            transforms.Normalize((0.5,),(0.5,)),
-        ]
-        if transform:
-            transform_list.extend(transform)
-        if augment:
-            transform_list.extend([
-                transforms.RandomHorizontalFlip(),
-                transforms.RandomCrop((224, 224))
-            ])
-        if resize:
-            transform_list.append(transforms.Resize(resize))
-        
-        self.transform = transforms.Compose(transform_list)
-            
-        ds = FER_CKPLUS_Dataset(data_dir, self.transform, h5_path=h5_path)
+        """            
+        ds = FER_CKPLUS_Dataset(data_dir, transform=transform, augment=augment, resize=resize , h5_path=h5_path)
         train_num = int(len(ds)*train_val_split) # default=0.9
         val_num = len(ds) - train_num
         train_ds, val_ds = random_split(ds, [train_num, val_num])
