@@ -94,6 +94,46 @@ class Deep_Emotion(nn.Module):
 
         out = F.relu(self.conv1(out))
         out = self.bn1(out)
+        out = F.relu(self.conv2(out))
+        out = self.bn2(out)
+        out = self.pool2(out)
+
+        # if using deformable convolution (only for 3/4 layer)
+        if self.de_conv:
+            out = F.relu(self.de_conv3(out))
+            out = self.bn3(out)
+            out = F.relu(self.de_conv4(out))
+            out = self.bn4(out)
+            out = self.pool4(out)
+        else:
+            out = F.relu(self.conv3(out))
+            out = self.bn3(out)
+            out = F.relu(self.conv4(out))
+            out = self.bn4(out)
+            out = self.pool4(out)
+
+        # deeper
+        if self.deeper:
+            out = F.relu(self.conv5(out))
+            out = self.bn5(out)
+
+            out = F.relu(self.conv6(out))
+            out = self.bn6(out)
+
+        out = F.dropout(out)
+        # out = out.view(-1, 1327104)
+        out = self.flatten(out)
+        out = F.relu(self.fc1(out))
+        out = self.bn_fc(out)
+        out = self.fc2(out)
+
+        return out
+
+    def forward_1208_1021AM(self,input):
+        out = self.stn(input)
+
+        out = F.relu(self.conv1(out))
+        out = self.bn1(out)
         out = self.conv2(out)
         out = self.bn2(out)
         out = F.relu(self.pool2(out))
