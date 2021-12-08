@@ -145,11 +145,6 @@ class Deep_Emotion224(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)     
         self.pool2 = nn.MaxPool2d(2,2)      # 110x110x32
 
-        # replace conv3/4 with deformable convolution
-        if de_conv:
-            self.de_conv3 = DeformableConv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=0)
-            self.de_conv4 = DeformableConv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=0)
-
         self.conv3 = nn.Conv2d(32,64,3)    # 108x108x64
         self.bn3 = nn.BatchNorm2d(64) 
         self.conv4 = nn.Conv2d(64,64,3)    # 106x106x64
@@ -157,6 +152,12 @@ class Deep_Emotion224(nn.Module):
         self.conv5 = nn.Conv2d(64,64,3)    # 104x104x64
         self.bn5 = nn.BatchNorm2d(64)  
         self.pool5 = nn.MaxPool2d(2,2)     # 52x52x64
+
+        # replace conv3/4 with deformable convolution
+        if de_conv:
+            self.conv3 = DeformableConv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=0)
+            self.conv4 = DeformableConv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=0)
+            self.conv5 = DeformableConv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=0)
 
         self.conv6 = nn.Conv2d(64,128,3)   # 50x50x128
         self.bn6 = nn.BatchNorm2d(128) 
@@ -211,25 +212,19 @@ class Deep_Emotion224(nn.Module):
 
         out = F.relu(self.conv1(out))
         out = self.bn1(out)
-        out = self.conv2(out)
+        out = F.relu(self.conv2(out))
         out = self.bn2(out)
-        out = F.relu(self.pool2(out))
+        out = self.pool2(out)
 
-        # if using deformable convolution (only for 3/4 layer)
-        if self.de_conv:
-            out = F.relu(self.de_conv3(out))
-            out = self.bn3(out)
-            out = self.bn4(self.de_conv4(out))
-            out = F.relu(self.pool4(out))
-        else:
-            out = F.relu(self.conv3(out))
-            out = self.bn3(out)
-            out = self.bn4(self.conv4(out))
-            out = F.relu(self.pool4(out))
-
-        # deeper
+        out = F.relu(self.conv3(out))
+        out = self.bn3(out)
+        out = F.relu(self.conv4(out))
+        out = self.bn4(out)
         out = F.relu(self.conv5(out))
         out = self.bn5(out)
+        out = self.pool5(out)
+
+        # deeper
         out = F.relu(self.conv6(out))
         out = self.bn6(out)
         out = F.relu(self.conv7(out))
