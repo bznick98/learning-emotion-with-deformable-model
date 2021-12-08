@@ -118,8 +118,7 @@ class FER_CKPLUS_Dataset(Dataset):
     def __getitem__(self, idx):
         img = self.imgs[idx]
         label = self.labels[idx]
-        if self.transform and self.is_train:
-            img = self.transform(img)
+        img = self.transform(img)
         return img ,label
 
         
