@@ -184,18 +184,27 @@ class Generate_data():
 
 
 class FER2013_Dataloader:
-    def __init__(self, data_dir="data/fer2013/", batchsize=128, num_workers=4, gen_data=False, h5_path=None):
+    def __init__(self, data_dir="data/fer2013/", batchsize=128, num_workers=4, gen_data=False, h5_path=None, transform=None, augment=False):
         """
         generate train / val / test loaders
         FER2013: 48x48 grayscale images
         """
         if gen_data:
             Generate_data(data_dir, h5_path)
-            
-        self.transform = transforms.Compose([
+
+        # process image pre-process and augment
+        transform_list = [
             transforms.ToTensor(),
             transforms.Normalize((0.5,),(0.5,)),
-        ])
+        ]
+        if transform:
+            transform_list.extend(transform)
+        if augment:
+            transform_list.extend([
+                transforms.RandomHorizontalFlip(),
+            ])
+        self.transform = transforms.Compose(transform_list)
+
 
         train_csv_file = data_dir +'/train.csv'
         validation_csv_file = data_dir + '/val.csv'
