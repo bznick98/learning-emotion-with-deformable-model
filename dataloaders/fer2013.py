@@ -11,7 +11,7 @@ import h5py
 
 
 class FER2013_Dataset(Dataset):
-    def __init__(self, csv_file, img_dir, datatype, transform, h5_path):
+    def __init__(self, csv_file, img_dir, datatype, transform, h5_path=None):
         '''
         Pytorch Dataset class
         params:-
@@ -54,7 +54,7 @@ class FER2013_Dataset(Dataset):
     def __getitem__(self, idx):
         if self.h5_path:
             img = self.imgs[idx]
-            label = self.label[idx]
+            label = self.labels[idx]
 
         else:
             if torch.is_tensor(idx):
@@ -223,5 +223,7 @@ class FER2013_Dataloader:
 
 if __name__ == "__main__":
     # ONLY FOR TESTING
-    dl = FER2013_Dataloader(gen_data=True, h5_path="./data/fer2013.h5")
+    dl = FER2013_Dataloader(gen_data=False, h5_path="./data/fer2013.h5")
     print(dl.train_len, dl.val_len)
+    for data, label in dl.train_loader:
+        print(data.shape, label)
