@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.dcn import DeformableConv2d
+from dcn import DeformableConv2d
 
 class Deep_Emotion(nn.Module):
     def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False):
@@ -163,15 +163,15 @@ class Deep_Emotion224(nn.Module):
         self.bn6 = nn.BatchNorm2d(128) 
         self.conv7 = nn.Conv2d(128,128,3)  # 48x48x128
         self.bn7 = nn.BatchNorm2d(128)  
-        self.pool7 = nn.MaxPool2d(2,2)     # 46x46x128
+        self.pool7 = nn.MaxPool2d(2,2)     # 24x24x128
 
-        self.conv8 = nn.Conv2d(128,16,1)   # 46x46x16
-        self.bn8 = nn.BatchNorm2d(16)  
-        self.pool8 = nn.MaxPool2d(2,2)     # 23x23x16
+        self.conv8 = nn.Conv2d(128,32,1)   # 24x24x32
+        self.bn8 = nn.BatchNorm2d(32)  
+        self.pool8 = nn.MaxPool2d(2,2)     # 12x12x32
 
         self.flatten = nn.Flatten()
         # handle 48x48 input
-        self.fc1 = nn.Linear(23 * 23 * 16, 32)
+        self.fc1 = nn.Linear(12 * 12 * 32, 32)
         self.bn_fc = nn.BatchNorm1d(32)
         self.fc2 = nn.Linear(32,7)
 
@@ -210,12 +210,14 @@ class Deep_Emotion224(nn.Module):
     def forward(self,input):
         out = self.stn(input)
 
+        # 1 & 2
         out = F.relu(self.conv1(out))
         out = self.bn1(out)
         out = F.relu(self.conv2(out))
         out = self.bn2(out)
         out = self.pool2(out)
-
+        
+        # 3 & 4 & 5
         out = F.relu(self.conv3(out))
         out = self.bn3(out)
         out = F.relu(self.conv4(out))
@@ -224,13 +226,14 @@ class Deep_Emotion224(nn.Module):
         out = self.bn5(out)
         out = self.pool5(out)
 
-        # deeper
+        # deeper 6 & 7
         out = F.relu(self.conv6(out))
         out = self.bn6(out)
         out = F.relu(self.conv7(out))
         out = self.bn7(out)
         out = self.pool7(out)
 
+        # 8 reduce features
         out = F.relu(self.conv8(out))
         out = self.bn8(out)
         out = self.pool8(out)
@@ -243,4 +246,11 @@ class Deep_Emotion224(nn.Module):
 
         return out
 
+# ONLY FOR TESTING
+if __name__ == "__main__":
+    net = Deep_Emotion224(de_conv=False)
+    x = torch.ones((16,1,224,224))
+    out = net(x)
+    print(f"Input shape: {x.shape}")
+    print(f"Output shape: {out.shape}")
 
