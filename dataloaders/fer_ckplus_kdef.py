@@ -23,13 +23,27 @@ class FER_CKPLUS_Dataset(Dataset):
         self.is_train = is_train
         self.transform = transform
         self.label_names = {
+            # fer_ck_plus_kdef & CK_PLUS_256
             "anger": 0,
             "disgust": 1,
             "fear": 2,
             "happiness": 3,
             "sadness": 4,
             "surprise": 5,
-            "neutrality": 6
+            "neutrality": 6,
+            # CK_PLUS (48x48) doesn't seem to find neutral in these data
+            "happy" : 3,
+            "contempt": 6,
+        }
+
+        self.num_label_names = {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "3": 3,
+            "4": 4,
+            "5": 5,
+            "6": 6
         }
         # either read from h5 file or read from image subdirectories
         if h5_path:
@@ -41,8 +55,13 @@ class FER_CKPLUS_Dataset(Dataset):
             # read all subdirectories
             dirs = os.listdir(img_dir)
             for dir in dirs:
-                if dir not in self.label_names: continue
-                curr_label = self.label_names[dir]
+                print("READ DIRNAME: ", dir)
+                if dir in self.label_names:
+                    curr_label = self.label_names[dir]
+                elif dir in self.num_label_names:
+                    curr_label = self.num_label_names[dir]
+                else:
+                    continue
                 for file in tqdm(os.listdir(img_dir + "/" + dir), desc=f"Loading {dir}"):
                     with Image.open(img_dir + "/" + dir + "/" + file) as img:
                         self.imgs.append(np.array(img))
@@ -131,6 +150,6 @@ class FER_CKPLUS_Dataloader:
 
 
 if __name__ == "__main__":
-    dl = FER_CKPLUS_Dataloader("data/fer_ckplus_kdef", h5_path="./data/fer_ckplus.h5")
+    dl = FER_CKPLUS_Dataloader("data/CK_PLUS_256")
     # test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0, h5_path="./data/fer_ckplus.h5")
     # dataset.save_h5(save_dir="./data/", data_name="fer_ckplus")
