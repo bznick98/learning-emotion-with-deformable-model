@@ -58,17 +58,21 @@ class Deep_Emotion(nn.Module):
 
         # STN & localization network
         self.localization = nn.Sequential(
-            nn.Conv2d(1, 8, kernel_size=7),
-            nn.MaxPool2d(2, stride=2),
+            nn.Conv2d(1, 8, kernel_size=7),     # 42x42xch  /   # 218x218xch
+            nn.MaxPool2d(2, stride=2),          # 21x21xch  /   # 109x109xch
             nn.ReLU(True),
-            nn.Conv2d(8, 10, kernel_size=5),
-            nn.MaxPool2d(2, stride=2),
+            nn.Conv2d(8, 10, kernel_size=5),    # 16x16xch  /   # 104x104xch
+            nn.MaxPool2d(2, stride=2),          # 8x8xch    /   # 52x52xch
             nn.ReLU(True)
         )
 
+        if input_224:
+            flat_len = 52 * 52 * 10 # 224x224 input
+        else:
+            flat_len = 8 * 8 * 10   # 48x48 input
         self.fc_loc = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(640, 32),
+            nn.Linear(flat_len, 32),
             nn.ReLU(True),
             nn.Linear(32, 3 * 2)
         )
