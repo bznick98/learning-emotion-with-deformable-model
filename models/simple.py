@@ -34,10 +34,8 @@ class Simple_CNN(nn.Module):
         # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
 
     def forward(self,input):
-        out = self.stn(input)
-
         # 1st conv
-        out = F.relu(self.conv1(out))
+        out = F.relu(self.conv1(input))
         out = self.bn1(out)
         out = self.pool1(out)
 
