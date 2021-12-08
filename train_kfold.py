@@ -122,7 +122,7 @@ def Train_kfold(epochs, dataset, criterion, optmizer, device, batch_size, k=10):
 
         torch.save(net.state_dict(),'deep_emotion-{}-{}.pt'.format(epochs,batch_size))
         print(f"=================================== Training Finished fold {fold+1} ===================================")
-    return train_loss_arr, train_acc_arr, val_loss_arr, val_acc_arr
+    return train_loss_kfolds, train_acc_kfolds, val_loss_kfolds, val_acc_kfolds
 
 
 if __name__ == "__main__":

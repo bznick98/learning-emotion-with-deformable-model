@@ -65,6 +65,10 @@ class FER_CKPLUS_Dataset(Dataset):
         if h5_path:
             print(f"Reading from h5 file: {h5_path}")
             self.read_h5(filepath=h5_path)
+            print("=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+            print("=-=-=-=-=--=-=-=-=-=SHAPE CHECK-=-=-=-=-=-=-=-=-=-=-=")
+            print("=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+            print(self.imgs.shape)
         else:
             self.imgs = []
             self.labels = []
