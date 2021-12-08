@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from models.dcn import DeformableConv2d
 
 class Deep_Emotion(nn.Module):
-    def __init__(self, wider=False, deeper=False, de_conv=False):
+    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False):
         '''
         Deep_Emotion (wider)
         input: Nx1x48x48
@@ -19,33 +19,38 @@ class Deep_Emotion(nn.Module):
         else:
             ch = 10
 
-        self.conv1 = nn.Conv2d(1,ch,3)      # 46x46xch
+        self.conv1 = nn.Conv2d(1,ch,3)      # 46x46xch  /   222x222xch
         self.bn1 = nn.BatchNorm2d(ch)     
-        self.conv2 = nn.Conv2d(ch,ch,3)     # 44x44xch
+        self.conv2 = nn.Conv2d(ch,ch,3)     # 44x44xch  /   220x220xch
         self.bn2 = nn.BatchNorm2d(ch)     
-        self.pool2 = nn.MaxPool2d(2,2)      # 22x22xch
+        self.pool2 = nn.MaxPool2d(2,2)      # 22x22xch  /   110x110xch
 
         # replace conv3/4 with deformable convolution
         if de_conv:
             self.de_conv3 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
             self.de_conv4 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
 
-        self.conv3 = nn.Conv2d(ch,ch,3)    # 20x20xch
+        self.conv3 = nn.Conv2d(ch,ch,3)    # 20x20xch   /   108x108xch
         self.bn3 = nn.BatchNorm2d(ch) 
-        self.conv4 = nn.Conv2d(ch,ch,3)    # 18x18xch
+        self.conv4 = nn.Conv2d(ch,ch,3)    # 18x18xch   /   106x106xch
         self.bn4 = nn.BatchNorm2d(ch)  
-        self.pool4 = nn.MaxPool2d(2,2)     # 9x9xch
+        self.pool4 = nn.MaxPool2d(2,2)     # 9x9xch     /   53x53xch
 
         # deeper network
         if deeper:
             self.conv5 = nn.Conv2d(ch,ch,3,padding='same')  # 9x9xch
             self.bn5 = nn.BatchNorm2d(ch)  
 
-            self.conv6 = nn.Conv2d(ch,ch,3,padding='same') # 7x7xch
+            self.conv6 = nn.Conv2d(ch,ch,3,padding='same') 
             self.bn6 = nn.BatchNorm2d(ch)
 
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(9 * 9 * ch, 50)
+        if input_224:
+            # handle 224x224 input
+            self.fc1 = nn.Linear(53 * 53 * ch, 50)
+        else:
+            # handle 48x48 input
+            self.fc1 = nn.Linear(9 * 9 * ch, 50)
         self.bn_fc = nn.BatchNorm1d(50)
         self.fc2 = nn.Linear(50,7)
 
