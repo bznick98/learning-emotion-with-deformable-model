@@ -36,8 +36,7 @@ class FER_CKPLUS_Dataset(Dataset):
             transform_list.append(transforms.Resize(resize))
         
         self.transform = transforms.Compose(transform_list)
-        self.is_train = is_train
-        self.transform = transform
+
         self.label_names = {
             # fer_ck_plus_kdef & CK_PLUS_256
             "anger": 0,
