@@ -65,6 +65,8 @@ class FER_CKPLUS_Dataset(Dataset):
         if h5_path:
             print(f"Reading from h5 file: {h5_path}")
             self.read_h5(filepath=h5_path)
+            print(self.imgs.shape)
+            print(len(self.imgs.shape))
             if len(self.imgs.shape) == 3:
                 # extend channel
                 self.img = self.imgs[:, np.newaxis, ...]
