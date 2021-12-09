@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from models.dcn import DeformableConv2d
 
 class Deep_Emotion(nn.Module):
-    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False):
+    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False, drop=0.5):
         '''
         Deep_Emotion (wider)
         input: Nx1x48x48
@@ -36,7 +36,7 @@ class Deep_Emotion(nn.Module):
         self.bn4 = nn.BatchNorm2d(ch)  
         self.pool4 = nn.MaxPool2d(2,2)     # 9x9xch     /   53x53xch
 
-        self.dropout = nn.Dropout(0.5)     # use nn.Dropout instead of F.dropout
+        self.dropout = nn.Dropout(drop)    # use nn.Dropout instead of F.dropout
 
         # deeper network
         if deeper:
@@ -172,7 +172,7 @@ class Deep_Emotion(nn.Module):
 
 
 class Deep_Emotion224(nn.Module):
-    def __init__(self, de_conv=False):
+    def __init__(self, de_conv=False, drop=0.5):
         '''
         Deep_Emotion (wider)
         input: Nx1x224x224
@@ -215,7 +215,7 @@ class Deep_Emotion224(nn.Module):
         # handle 48x48 input
         self.fc1 = nn.Linear(12 * 12 * 32, 32)
         self.bn_fc = nn.BatchNorm1d(32)
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(drop)
         self.fc2 = nn.Linear(32,7)
 
         # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
