@@ -36,6 +36,8 @@ class Deep_Emotion(nn.Module):
         self.bn4 = nn.BatchNorm2d(ch)  
         self.pool4 = nn.MaxPool2d(2,2)     # 9x9xch     /   53x53xch
 
+        self.dropout = nn.Dropout(0.5)     # use nn.Dropout instead of F.dropout
+
         # deeper network
         if deeper:
             self.conv5 = nn.Conv2d(ch,ch,3,padding='same')  # 9x9xch
@@ -120,7 +122,7 @@ class Deep_Emotion(nn.Module):
             out = F.relu(self.conv6(out))
             out = self.bn6(out)
 
-        out = F.dropout(out)
+        out = self.dropout(out)
         # out = out.view(-1, 1327104)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
@@ -158,7 +160,7 @@ class Deep_Emotion(nn.Module):
             out = F.relu(self.conv6(out))
             out = self.bn6(out)
 
-        out = F.dropout(out)
+        out = self.dropout(out)
         # out = out.view(-1, 1327104)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
@@ -208,6 +210,8 @@ class Deep_Emotion224(nn.Module):
         self.conv8 = nn.Conv2d(128,32,1)   # 24x24x32
         self.bn8 = nn.BatchNorm2d(32)  
         self.pool8 = nn.MaxPool2d(2,2)     # 12x12x32
+
+        self.dropout = nn.Dropout(0.5)
 
         self.flatten = nn.Flatten()
         # handle 48x48 input
@@ -278,7 +282,7 @@ class Deep_Emotion224(nn.Module):
         out = self.bn8(out)
         out = self.pool8(out)
 
-        out = F.dropout(out)
+        out = self.dropout(out)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
         out = self.bn_fc(out)
