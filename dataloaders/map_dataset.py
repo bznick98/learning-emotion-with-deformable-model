@@ -15,7 +15,8 @@ class MapDataset(torch.utils.data.Dataset):
         self.map = map_fn
 
     def __getitem__(self, index):
-        return self.map(self.dataset[index])
+        img, label = self.dataset[index]
+        return self.map(img), label
 
     def __len__(self):
         return len(self.dataset)
