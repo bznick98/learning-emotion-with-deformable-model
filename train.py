@@ -97,7 +97,7 @@ def Train(epochs, data_loader, criterion, optmizer, device):
         # save for plotting
         train_loss_arr.append(train_loss)
         train_acc_arr.append(train_acc)
-        val_loss_arr.append(val_loss)
+        val_loss_arr.append(validation_loss)
         val_acc_arr.append(val_acc)
 
     torch.save(net.state_dict(),'deep_emotion-{}-{}-{}.pt'.format(epochs,batchsize,lr))

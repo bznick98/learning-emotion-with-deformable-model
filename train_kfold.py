@@ -111,7 +111,7 @@ def Train_kfold(epochs, dataset, criterion, optmizer, device, batch_size, k=10):
             # save for plotting
             train_loss_arr.append(train_loss)
             train_acc_arr.append(train_acc)
-            val_loss_arr.append(val_loss)
+            val_loss_arr.append(validation_loss)
             val_acc_arr.append(val_acc)
         
         # history for each fold
