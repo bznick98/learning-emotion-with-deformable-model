@@ -30,7 +30,8 @@ class FER_CKPLUS_Dataset(Dataset):
         if augment:
             transform_list.extend([
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomCrop((224, 224))
+                # transforms.RandomCrop((224, 224)) # for 224 input
+                transforms.RandomCrop((36, 36))   # for 48 inputs
             ])
         if resize:
             transform_list.append(transforms.Resize(resize))
