@@ -122,12 +122,13 @@ class Deep_Emotion(nn.Module):
             out = F.relu(self.conv6(out))
             out = self.bn6(out)
 
-        out = self.dropout(out)
         # out = out.view(-1, 1327104)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
         out = self.bn_fc(out)
+        out = self.dropout(out)
         out = self.fc2(out)
+        out = self.dropout(out)
 
         return out
 
@@ -160,12 +161,13 @@ class Deep_Emotion(nn.Module):
             out = F.relu(self.conv6(out))
             out = self.bn6(out)
 
-        out = self.dropout(out)
         # out = out.view(-1, 1327104)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
         out = self.bn_fc(out)
+        out = self.dropout(out)
         out = self.fc2(out)
+        out = self.dropout(out)
 
         return out
 
@@ -211,12 +213,11 @@ class Deep_Emotion224(nn.Module):
         self.bn8 = nn.BatchNorm2d(32)  
         self.pool8 = nn.MaxPool2d(2,2)     # 12x12x32
 
-        self.dropout = nn.Dropout(0.5)
-
         self.flatten = nn.Flatten()
         # handle 48x48 input
         self.fc1 = nn.Linear(12 * 12 * 32, 32)
         self.bn_fc = nn.BatchNorm1d(32)
+        self.dropout = nn.Dropout(0.5)
         self.fc2 = nn.Linear(32,7)
 
         # torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
@@ -282,11 +283,12 @@ class Deep_Emotion224(nn.Module):
         out = self.bn8(out)
         out = self.pool8(out)
 
-        out = self.dropout(out)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
         out = self.bn_fc(out)
+        out = self.dropout(out)
         out = self.fc2(out)
+        out = self.dropout(out)
 
         return out
 
