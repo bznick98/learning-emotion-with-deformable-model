@@ -49,11 +49,12 @@ class Simple_CNN(nn.Module):
         out = self.bn3(out)
         out = self.pool3(out)
 
-        out = F.dropout(out)
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
         out = self.bn_fc(out)
+        out = F.dropout(out)
         out = self.fc2(out)
+        out = F.dropout(out)
 
         return out
 
