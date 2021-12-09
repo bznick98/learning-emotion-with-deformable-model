@@ -128,6 +128,7 @@ class Deep_Emotion(nn.Module):
         out = self.bn_fc(out)
         out = self.dropout(out)
         out = self.fc2(out)
+        out = self.dropout(out)
 
         return out
 
@@ -166,6 +167,7 @@ class Deep_Emotion(nn.Module):
         out = self.bn_fc(out)
         out = self.dropout(out)
         out = self.fc2(out)
+        out = self.dropout(out)
 
         return out
 
@@ -286,6 +288,7 @@ class Deep_Emotion224(nn.Module):
         out = self.bn_fc(out)
         out = self.dropout(out)
         out = self.fc2(out)
+        out = self.dropout(out)
 
         return out
 
