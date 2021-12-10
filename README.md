@@ -33,6 +33,9 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - No significant performance boost.
 - VGG
   - really big model, might overfit.
+- Simple_CNN
+  - 3 Conv layers + 2 FC layers
+  - simple network to test avoid overfitting
 
 ### Optional Components *(recommended)*
 - Deformable Convolution Layers
@@ -78,6 +81,12 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
 - Example: if want to run on dataset `CK_PLUS` using `Deep Emotion` with some tricks added, we can: 
 
 ```python train.py -d data/CK_PLUS -ds CK_PLUS -m de -dc -wide -n_drop 2 -drop 0.4 -rcrop -rcrop_size 224 -hflip -resize 48```
+
+### Project Structures
+* all DL model classes are under models/
+* all custom dataset classes are under datasets/
+* data can be put into data/
+* some utils used for training are put under utils/
 
 # Experiments
 Link to experiments I've done: https://ppnk.notion.site/CS269-Final-Project-Experiments-1e0e15bde4134825b58f0ec8257bd1bd
