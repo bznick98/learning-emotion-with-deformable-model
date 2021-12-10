@@ -57,7 +57,7 @@ def choose_dataset(args):
             read_dir = args.data
         else:
             read_dir = "/content/gdrive/MyDrive/FER_CKPLUS/" # read from google drive
-        ds = FER_CKPLUS_Dataset(img_dir=read_dir, h5_path=os.path.join(read_dir, "fer_ckplus.h5"))
+        ds = FER_CKPLUS_Dataset(img_dir=read_dir, h5_path=os.path.join(read_dir, "fer_ckplus.h5"), transform=[transforms.RandomHorizontalFlip()])
                                 
     elif args.dataset == "CK_PLUS": # CK+ 
         if args.data:
