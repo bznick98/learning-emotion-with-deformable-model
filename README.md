@@ -75,8 +75,8 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
 - `-d` specifies the directory stored specific dataset, like `fer2013/`,  `fer_ckplus_kef/` and `CK_PLUS/`. I put all those data under `./data/`, so `-d data/CK_PLUS` if we want to use `CK_PLUS`.
 - `-ds`, acutually a little bit redundant? specifies which dataset we want to use, a `str`, can only be one of {`FER2013`, `FER_CKPLUS`, `CK_PLUS`}
 - `-m` specifies model we want to use, can only be one of {`de`, `de224`, `vgg`, `simple`}
-- Example: if want to run `CK_PLUS` using `Deep Emotion` with some tricks added, we can: 
-- `python train.py -d data/CK_PLUS -ds CK_PLUS -m de -dc -wide -n_drop 2 -drop 0.4 -rcrop -rcrop_size 224 -hflip -resize 48`
+- Example: if want to run on dataset `CK_PLUS` using `Deep Emotion` with some tricks added, we can: 
+- ```python train.py -d data/CK_PLUS -ds CK_PLUS -m de -dc -wide -n_drop 2 -drop 0.4 -rcrop -rcrop_size 224 -hflip -resize 48```
 
 # Experiments
 Link to experiments I've done: https://ppnk.notion.site/CS269-Final-Project-Experiments-1e0e15bde4134825b58f0ec8257bd1bd
