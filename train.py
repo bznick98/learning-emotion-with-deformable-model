@@ -13,7 +13,7 @@ from sklearn.model_selection import KFold
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # utility tools
-from utils.util_tools import choose_dataset, choose_model, train_epoch, val_epoch, device_setup, get_augmentations, plot
+from utils.util_tools import choose_dataset, choose_model, print_config, train_epoch, val_epoch, device_setup, get_augmentations, plot, print_config
 from datasets.map_dataset import MapDataset
 
 
@@ -177,6 +177,8 @@ if __name__ == "__main__":
     # choose model based on args config
     net = choose_model(args, input_size=img_size)
 
+    print_config(args)
+
     # k-fold cross validation
     history = train_kfold(net=net,
                             epochs=args.epochs,
@@ -189,9 +191,7 @@ if __name__ == "__main__":
                             lr_schedule=args.schedule,
                             augmentations=augment_list)
 
-    print("=============== Current Running Configuration ===============")
-    print(args)
-    print("=============================================================")
+    print_config(args)
     
     # plot
     plot(history)

@@ -220,3 +220,13 @@ def plot(history):
 
     print(f"{len(train_acc_kfolds)}-fold average Training Acc = {avg_train_acc}")
     print(f"{len(val_acc_kfolds)}-fold average Validation Acc = {avg_val_acc}")
+
+
+
+def print_config(args):
+    """
+    print :)
+    """
+    print("=============== Current Running Configuration ===============")
+    print(args)
+    print("=============================================================")
