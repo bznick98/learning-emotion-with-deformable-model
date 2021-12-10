@@ -104,4 +104,4 @@ Link to experiments I've done: https://ppnk.notion.site/CS269-Final-Project-Expe
 - [ ] Find out a suitbale/best performance network.
 - [ ] Investigate more on STN part in deep emotion.
 - [ ] Combine Deformable Model (contours/landmark) to boost DL model performance.
-- [ ] Data Augmentation part of parse are a little redundant, especially `-rcrop` and `-rcrop_size`, only need one.
+- [ ] Data Augmentation part of **parser** are a little redundant, especially `-rcrop` and `-rcrop_size`, only need one.
