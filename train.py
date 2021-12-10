@@ -23,11 +23,10 @@ parser = argparse.ArgumentParser(description="Configuration of setup and trainin
 parser.add_argument('-s', '--setup', action='store_true', help='setup the dataset for the first time')
 parser.add_argument('-d', '--data', type=str, default='/content/gdrive/MyDrive/',
                             help='Image folders for loading data, can be:\n\
-                                FER2013: folder path that contains csv that downloaded from kaggle (icml_face_data.csv)\
-                                FER_CKPLUS: folder path that contains 8 subfolders\
+                                FER2013: folder path that contains csv that downloaded from kaggle (icml_face_data.csv)\n\
+                                FER_CKPLUS: folder path that contains 8 subfolders\n\
                                 CK_PLUS: folder path that contains 7 subfolders')
 parser.add_argument('-ds', '--dataset', type=str, default='CK_PLUS', help='choice of \{FER2013, FER_CKPLUS, CK_PLUS\}')
-parser.add_argument('-b', '--big', action='store_true', help='if enabled, input data will be treated as 224x224 (only for CK_PLUS dataset)')
 
 # model arch settings
 parser.add_argument('-m', '--model', type=str, default='de', help='DL model to run, can only be one of {de, de224, vgg, simple}')
@@ -51,12 +50,14 @@ parser.add_argument('-rcrop', '--random_crop', action='store_true', help='if ena
 parser.add_argument('-rcrop_size', '--random_crop_size', type=int, default=224, help='if -rcrop enabled, set size (if=224, then crop 224x224)')
 parser.add_argument('-rjitter', '--random_jitter', action='store_true', help='if enabled, add transforms.RandomColorJitter() to aug')
 parser.add_argument('-rjitter_b', '--random_jitter_brightness', type=float, default=0.3, help='if -rjitter enabled, set brightness, 0-1')
+parser.add_argument('-resize', '--resize', type=int, default=-1, help='if specified (>0), resize to this size')
+
 
 args = parser.parse_args()
 
 
 
-def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False, lr_schedule=False, augmentations=None):
+def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,224), lr_schedule=False, augmentations=None):
     '''
     Training Loop
     '''
@@ -64,11 +65,6 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False,
     device = device_setup()
 
     net.to(device)
-
-    if input_224:
-        input_size = (224, 224)
-    else:
-        input_size = (48, 48)
 
     # K-Folds split cross validation
     if k == 0:
@@ -83,6 +79,8 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False,
     max_train_acc_kfolds = []
     max_val_acc_kfolds = []
 
+    summary(net, input_size=(batch_size, 1, input_size[0], input_size[1]), verbose=1)
+
     for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
         # Optimizer
         optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=wd)
@@ -93,8 +91,6 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False,
         criterion = nn.CrossEntropyLoss()
 
         # print model info
-        if fold == 0: summary(net, input_size=(batch_size, 1, input_size[0], input_size[1]), verbose=1)
-
         print(f"=================================== Start Training fold {fold+1}/{k+1} ===================================")
         # k-folds sampling
         train_subset = Subset(dataset, train_idx)
@@ -165,16 +161,19 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False,
 
 
 if __name__ == "__main__":
-    # choose model based on args config
-    net = choose_model(args)
-
     # choose dataset based on args config
     dataset = choose_dataset(args)
+    img_size = dataset[0][0].detach().numpy().shape[1:]   # 2d image size (48x48) or (224x224)
 
     # prepare data augmentations
-    augment_list = get_augmentations(args)
-    
-    # train cross validation (currently only support CK_PLUS)
+    if args.resize > 0:
+        img_size = (args.resize, args.resize)
+    # augmentation will have final training image size => out_size
+    augment_list = get_augmentations(args, out_size=img_size)
+
+    # choose model based on args config
+    net = choose_model(args, input_size=img_size)
+
     # k-fold cross validation
     history = train_kfold(net=net,
                             epochs=args.epochs,
@@ -183,11 +182,13 @@ if __name__ == "__main__":
                             lr=args.learning_rate,
                             wd=args.weight_decay,
                             k=args.k_fold,
-                            input_224=args.big,
+                            input_size=img_size, 
                             lr_schedule=args.schedule,
                             augmentations=augment_list)
 
-
+    print("=============== Current Running Configuration ===============")
+    print(args)
+    print("=============================================================")
     # plot
 
     

@@ -71,10 +71,15 @@ def choose_dataset(args):
     return ds
 
 
-def choose_model(args):
+def choose_model(args, input_size=(224,224)):
+    # TODO: use input size information in building mode instead of passing hardcoded flag
+    input_224 = False
+    if input_size[0] == 224:
+        input_224 = True
+
     # Choosing model
     if args.model == 'de':
-        net = Deep_Emotion(wider=args.wide, deeper=args.deep, de_conv=args.de_conv, input_224=args.big, drop=args.dropout)
+        net = Deep_Emotion(wider=args.wide, deeper=args.deep, de_conv=args.de_conv, input_224=input_224, drop=args.dropout)
     elif args.model == 'vgg':
         net = Vgg()
     elif args.model == 'de224':
@@ -87,16 +92,20 @@ def choose_model(args):
     return net
 
 
-def get_augmentations(args):
+def get_augmentations(args, out_size):
     """
-    specify augmentation
+    specify augmentation, out_size specified final return image size
     """
     aug_list = []
     if args.random_hflip:
         aug_list.append(transforms.RandomHorizontalFlip(args.random_hflip_prob))
     if args.random_crop:
-        aug_list.append(transforms.RandomHorizontalFlip(args.random_crop_size))
+        aug_list.append(transforms.RandomCrop(args.random_crop_size))
+
+    # if specified resize size, otherwise resize will be loaded image size
+    aug_list.append(transforms.Resize(out_size))
     
+    print(aug_list)
     return aug_list
 
 
