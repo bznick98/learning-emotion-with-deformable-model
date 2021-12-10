@@ -26,12 +26,13 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - 7 labels: `anger`, `disgust`, `fear`, `happiness`, `sadness`, `surprise`, `neutrality`
   - unstable validation :(
   - achieves highest accuracy
+  - NOTE: be sure to add `-resize 224` if you want to use it on models that expect 224 input, another option is to add `-rcrop_size 224`
 
 # Models
 ### Architectures
 - **Deep_Emotion**
-  - have 224x224 input version and 48x48 input version.
-  - if choosing 224x224 as input, large portion of parameters will be in fc layers.
+  - have both 224x224 input version and 48x48 input version.
+  - if choosing 224x224 as input, large portion of parameters will be in fc layers. 
   - added BatchNorm after every Conv/FC compared to original deep emotion.
 - **Deep_Emotion224**
   - dedicated for 224x224 input.
