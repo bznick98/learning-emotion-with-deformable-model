@@ -223,6 +223,7 @@ def plot(history, save=None):
 
     if save:
         plt.savefig(f'acc-loss-e{epochs}.png')
+        print(f"Plot saved")
 
 
 

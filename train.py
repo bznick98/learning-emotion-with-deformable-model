@@ -68,6 +68,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
     # K-Folds split cross validation
     if k == 0:
         splits=KFold(n_splits=10,shuffle=True)
+        k = 1
     else:
         splits=KFold(n_splits=k,shuffle=True)
 
@@ -97,7 +98,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
         criterion = nn.CrossEntropyLoss()
 
         # print model info
-        print(f"=================================== Start Training fold {fold+1}/{k+1} ===================================")
+        print(f"=================================== Start Training fold {fold+1}/{k} ===================================")
         # k-folds sampling
         train_subset = Subset(dataset, train_idx)
         val_subset = Subset(dataset, val_idx)
