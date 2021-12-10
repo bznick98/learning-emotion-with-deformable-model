@@ -92,10 +92,22 @@ def choose_model(args, input_size=(224,224)):
     return net
 
 
-def get_augmentations(args, out_size):
+def get_augmentations(args, input_size):
     """
     specify augmentation, out_size specified final return image size
+    input:
+        - args
+        - input_size: raw input image size loaded from data
+    return:
+        - aug_list: list of transforms.XXX
+        - out_size: final image size for training
     """
+    out_size = input_size
+    if args.random_crop:
+        out_size = (args.random_crop_size, args.random_crop_size)
+    if args.resize > 0:
+        out_size = (args.resize, args.resize)
+
     aug_list = []
     if args.random_hflip:
         aug_list.append(transforms.RandomHorizontalFlip(args.random_hflip_prob))
@@ -105,8 +117,7 @@ def get_augmentations(args, out_size):
     # if specified resize size, otherwise resize will be loaded image size
     aug_list.append(transforms.Resize(out_size))
     
-    print(aug_list)
-    return aug_list
+    return aug_list, out_size
 
 
 def train_epoch(net, criterion, device, train_loader, train_len, optimizer):
@@ -172,3 +183,41 @@ def device_setup():
         print('Cached:   ', round(torch.cuda.memory_reserved(0)/1024**3,1), 'GB')
     
     return device
+
+
+def plot(history):
+    # Plotting loss/acc
+    import matplotlib.pyplot as plt
+
+    train_loss_kfolds, train_acc_kfolds, val_loss_kfolds, val_acc_kfolds, max_train_acc_kfolds, max_val_acc_kfolds = history # returned from train()
+    epochs = len(train_loss_kfolds[0])
+    xs = [i for i in range(epochs)]
+
+    fig, axes = plt.subplots(1,4, figsize=(20,4))
+    for train_loss_arr in train_loss_kfolds:
+        axes[0].plot(xs, train_loss_arr)
+    axes[0].set_title("Train Loss vs epochs")
+
+    for train_acc_arr in train_acc_kfolds:
+        axes[1].plot(xs, train_acc_arr)
+    axes[1].set_title("Train Accuracy vs epochs")
+
+    for val_loss_arr in val_loss_kfolds:
+        axes[2].plot(xs, val_loss_arr)
+    axes[2].set_title("Val Loss vs epochs")
+
+    for val_acc_arr in val_acc_kfolds:
+        axes[3].plot(xs, val_acc_arr)
+    axes[3].set_title("Val Accuracy vs epochs")
+    plt.show()
+
+    # Average Acc for K-folds from LAST epoch
+    # avg_train_acc = sum([arr[-1] for arr in train_acc_kfolds]) / len(train_acc_kfolds)
+    # avg_val_acc = sum([arr[-1] for arr in val_acc_kfolds]) / len(val_acc_kfolds)
+
+    # Average Acc for K-folds from HIGHEST epoch
+    avg_train_acc = np.mean(max_train_acc_kfolds)
+    avg_val_acc = np.mean(max_val_acc_kfolds)
+
+    print(f"{len(train_acc_kfolds)}-fold average Training Acc = {avg_train_acc}")
+    print(f"{len(val_acc_kfolds)}-fold average Validation Acc = {avg_val_acc}")

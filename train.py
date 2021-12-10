@@ -13,7 +13,7 @@ from sklearn.model_selection import KFold
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # utility tools
-from utils.util_tools import choose_dataset, choose_model, train_epoch, val_epoch, device_setup, get_augmentations
+from utils.util_tools import choose_dataset, choose_model, train_epoch, val_epoch, device_setup, get_augmentations, plot
 from datasets.map_dataset import MapDataset
 
 
@@ -165,11 +165,8 @@ if __name__ == "__main__":
     dataset = choose_dataset(args)
     img_size = dataset[0][0].detach().numpy().shape[1:]   # 2d image size (48x48) or (224x224)
 
-    # prepare data augmentations
-    if args.resize > 0:
-        img_size = (args.resize, args.resize)
     # augmentation will have final training image size => out_size
-    augment_list = get_augmentations(args, out_size=img_size)
+    augment_list, img_size = get_augmentations(args, img_size)
 
     # choose model based on args config
     net = choose_model(args, input_size=img_size)
@@ -189,6 +186,7 @@ if __name__ == "__main__":
     print("=============== Current Running Configuration ===============")
     print(args)
     print("=============================================================")
+    
     # plot
-
+    plot(history)
     
