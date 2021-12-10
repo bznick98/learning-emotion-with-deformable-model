@@ -172,7 +172,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
         torch.cuda.empty_cache()
 
         # normal training ends here (using 10-fold split, but run 1 time)
-        if k == 0:
+        if k == 1:
             break
 
     return train_loss_kfolds, train_acc_kfolds, val_loss_kfolds, val_acc_kfolds, max_train_acc_kfolds, max_val_acc_kfolds
