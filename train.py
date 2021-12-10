@@ -165,8 +165,8 @@ if __name__ == "__main__":
     dataset = choose_dataset(args)
     img_size = dataset[0][0].detach().numpy().shape[1:]   # 2d image size (48x48) or (224x224)
 
-    # augmentation will have final training image size => out_size
-    augment_list, img_size = get_augmentations(args, img_size)
+    # augmentation will have final training image size => img_size
+    augment_list, img_size = get_augmentations(args, input_size=img_size)
 
     # choose model based on args config
     net = choose_model(args, input_size=img_size)
