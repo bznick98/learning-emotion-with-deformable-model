@@ -64,8 +64,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
     # setting up device
     device = device_setup()
 
-    net.to(device)
-
+    copy_net = net
     # K-Folds split cross validation
     if k == 0:
         splits=KFold(n_splits=10,shuffle=True)
@@ -85,6 +84,10 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
     augmentations = transforms.Compose(augmentations)
 
     for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
+        # copy from clean model
+        net = copy_net
+        net.to(device)
+
         # Optimizer
         optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=wd)
         if lr_schedule:
