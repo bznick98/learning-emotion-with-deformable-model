@@ -57,14 +57,13 @@ args = parser.parse_args()
 
 
 
-def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,224), lr_schedule=False, augmentations=None):
+def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,224), lr_schedule=False, augmentations=None, args=None):
     '''
     Training Loop
     '''
     # setting up device
     device = device_setup()
 
-    copy_net = net
     # K-Folds split cross validation
     if k == 0:
         splits=KFold(n_splits=10,shuffle=True)
@@ -85,7 +84,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
 
     for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
         # copy from clean model
-        net = copy_net
+        net = choose_model(args)
         net.to(device)
 
         # Optimizer
@@ -194,7 +193,8 @@ if __name__ == "__main__":
                             k=args.k_fold,
                             input_size=img_size, 
                             lr_schedule=args.schedule,
-                            augmentations=augment_list)
+                            augmentations=augment_list,
+                            args=args)
 
     print_config(args)
     
