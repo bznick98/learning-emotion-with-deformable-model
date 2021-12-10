@@ -88,7 +88,16 @@ def choose_model(args):
 
 
 def get_augmentations(args):
-    pass
+    """
+    specify augmentation
+    """
+    aug_list = []
+    if args.random_hflip:
+        aug_list.append(transforms.RandomHorizontalFlip(args.random_hflip_prob))
+    if args.random_crop:
+        aug_list.append(transforms.RandomHorizontalFlip(args.random_crop_size))
+    
+    return aug_list
 
 
 def train_epoch(net, criterion, device, train_loader, train_len, optimizer):

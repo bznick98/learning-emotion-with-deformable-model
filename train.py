@@ -44,7 +44,14 @@ parser.add_argument('-bs', '--batch_size', type=int, default=128, help='training
 parser.add_argument('-wd', '--weight_decay', type=float, default=1e-4, help='weight decay coeff(L2 regularization)')
 parser.add_argument('-drop', '--dropout', type=float, default=0, help='dropout rate, 0-1, 0=no dropout')
 
-parser.add_argument('--show', action='store_true', help='Show 1 training sample.')
+# data augmentation options
+parser.add_argument('-hflip', '--random_hflip', action='store_true', help='if enabled, add transforms.RandomHorizontalFlip() to aug')
+parser.add_argument('-hflip_prob', '--random_hflip_prob', type=float, default=0.5, help='if -hflip enabled, set probability')
+parser.add_argument('-rcrop', '--random_crop', action='store_true', help='if enabled, add transforms.RandomCrop() to aug')
+parser.add_argument('-rcrop_size', '--random_crop_size', type=int, default=224, help='if -rcrop enabled, set size (if=224, then crop 224x224)')
+parser.add_argument('-rjitter', '--random_jitter', action='store_true', help='if enabled, add transforms.RandomColorJitter() to aug')
+parser.add_argument('-rjitter_b', '--random_jitter_brightness', type=float, default=0.3, help='if -rjitter enabled, set brightness, 0-1')
+
 args = parser.parse_args()
 
 
@@ -80,7 +87,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False,
         # Optimizer
         optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=wd)
         if lr_schedule:
-          scheduler = ReduceLROnPlateau(optimizer, 'min', patience=20, verbose=1, min_lr=1e-7)
+            scheduler = ReduceLROnPlateau(optimizer, 'min', patience=20, verbose=1, min_lr=1e-7)
 
         # Loss
         criterion = nn.CrossEntropyLoss()
@@ -94,7 +101,8 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False,
         val_subset = Subset(dataset, val_idx)
         # augment training set
         if augmentations:
-          train_subset = MapDataset(train_subset, augmentations)
+            augmentations = transforms.Compose(augmentations)
+            train_subset = MapDataset(train_subset, augmentations)
         train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
         val_loader = DataLoader(val_subset, batch_size=batch_size)
         train_len = len(train_subset)
