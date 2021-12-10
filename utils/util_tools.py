@@ -223,8 +223,9 @@ def plot(history, save=None):
     print(f"{len(val_acc_kfolds)}-fold average Validation Acc = {avg_val_acc}")
 
     if save:
-        plt.savefig(f'acc-loss-e{epochs}.png')
-        print(f"Plot saved")
+        filename = f'acc-loss-e{epochs}.png'
+        fig.savefig(filename)
+        print(f"Plot saved at {os.path.abspath(filename)}")
     plt.show()
 
 
