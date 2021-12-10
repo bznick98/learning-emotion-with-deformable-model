@@ -23,10 +23,12 @@ class FER_CKPLUS_Dataset(Dataset):
         # base transform, transforms passed by parameter will be append to the end of list
         transform_list = [
             transforms.ToTensor(),
-            transforms.Normalize((0.5,),(0.5,)),
         ]
         if transform:
             transform_list.extend(transform)
+        transform_list.extend([
+            transforms.Normalize((0.5,),(0.5,)),
+        ])
         
         self.transform = transforms.Compose(transform_list)
 
