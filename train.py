@@ -42,6 +42,7 @@ parser.add_argument('-lr', '--learning_rate', type=float, default=1e-4, help='va
 parser.add_argument('-bs', '--batch_size', type=int, default=32, help='training/validation batch size')
 parser.add_argument('-wd', '--weight_decay', type=float, default=1e-2, help='weight decay coeff(L2 regularization)')
 parser.add_argument('-drop', '--dropout', type=float, default=0, help='dropout rate, 0-1, 0=no dropout')
+parser.add_argument('-n_drop', '--num_dropout', type=int, default=1, help='number of dropout layers, in FC layer')
 
 # data augmentation options
 parser.add_argument('-hflip', '--random_hflip', action='store_true', help='if enabled, add transforms.RandomHorizontalFlip() to aug')

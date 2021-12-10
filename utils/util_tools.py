@@ -80,13 +80,13 @@ def choose_model(args, input_size=(224,224)):
 
     # Choosing model
     if args.model == 'de':
-        net = Deep_Emotion(wider=args.wide, deeper=args.deep, de_conv=args.de_conv, input_224=input_224, drop=args.dropout)
+        net = Deep_Emotion(wider=args.wide, deeper=args.deep, de_conv=args.de_conv, input_224=input_224, drop=args.dropout, n_drop=args.num_dropout)
     elif args.model == 'vgg':
         net = Vgg()
     elif args.model == 'de224':
-        net = Deep_Emotion224(de_conv=args.de_conv, drop=args.dropout)
+        net = Deep_Emotion224(de_conv=args.de_conv, drop=args.dropout, n_drop=args.num_dropout)
     elif args.model == 'simple':
-        net = Simple_CNN(drop=args.dropout)
+        net = Simple_CNN(drop=args.dropout, n_drop=args.num_dropout)
     else:
         raise Exception("-m or --model can only accpet one of \{de, vgg, de224, simple\}")
 

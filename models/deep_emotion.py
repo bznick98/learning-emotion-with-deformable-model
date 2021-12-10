@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from models.dcn import DeformableConv2d
 
 class Deep_Emotion(nn.Module):
-    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False, drop=0):
+    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False, drop=0, n_drop=1):
         '''
         Deep_Emotion (wider)
         input: (NxCx48x48) (can accept 224x224 input if input_224 set to True)
@@ -18,6 +18,7 @@ class Deep_Emotion(nn.Module):
         self.wider = wider
         self.deeper = deeper
         self.de_conv = de_conv
+        self.n_drop = n_drop
         if wider:
             ch = 64
         else:
@@ -125,12 +126,15 @@ class Deep_Emotion(nn.Module):
         out = self.dropout(out)
         out = self.fc2(out)
 
+        if self.n_drop == 2:
+            out = self.dropout(out)
+
         return out
 
 
 
 class Deep_Emotion224(nn.Module):
-    def __init__(self, de_conv=False, drop=0):
+    def __init__(self, de_conv=False, drop=0, n_drop=1):
         '''
         Deep_Emotion, designed for 224x224 input, channels are wider than baseline Deep_Emotion
         input: (NxCx224x224)
@@ -140,6 +144,7 @@ class Deep_Emotion224(nn.Module):
         super().__init__()
 
         self.de_conv = de_conv
+        self.n_drop = n_drop
 
         self.conv1 = nn.Conv2d(1,32,3)      # 222x222x32
         self.bn1 = nn.BatchNorm2d(32)     
@@ -246,6 +251,9 @@ class Deep_Emotion224(nn.Module):
         out = self.bn_fc(out)
         out = self.dropout(out)
         out = self.fc2(out)
+
+        if self.n_drop == 2:
+            out = self.dropout(out)
 
         return out
 

@@ -7,12 +7,13 @@ class Simple_CNN(nn.Module):
     """
     Simple CNN, to test if simple model still overfits data
     """
-    def __init__(self, drop=0):
+    def __init__(self, drop=0, n_drop=1):
         '''
         input: Nx1x48x48
             - drop: dropout rate before 1st FC layer
         '''
         super().__init__()
+        self.n_drop = n_drop
 
         self.conv1 = nn.Conv2d(1,32,3,padding='same')       # 48x48
         self.bn1 = nn.BatchNorm2d(32)     
@@ -56,7 +57,8 @@ class Simple_CNN(nn.Module):
         out = self.bn_fc(out)
         out = self.dropout(out)
         out = self.fc2(out)
-        out = F.dropout(out)
+        if self.n_drop == 2:
+            out = self.dropout(out)
 
         return out
 
