@@ -29,26 +29,28 @@ def choose_dataset(args):
         if args.setup:
             Generate_data()
         else:
-            train_csv_file = read_dir +'/train.csv'
-            val_csv_file = read_dir + '/val.csv'
-            test_csv_file = read_dir +'/test.csv'
+            train_csv_file = os.path.join(read_dir, '/train.csv')
+            val_csv_file = os.path.join(read_dir, '/val.csv')
+            test_csv_file = os.path.join(read_dir, '/test.csv')
 
-            train_img_dir = read_dir + '/train/'
-            val_img_dir = read_dir + '/val/'
-            test_img_dir = read_dir + '/test/'
+            train_img_dir = os.path.join(read_dir, '/train/')
+            val_img_dir = os.path.join(read_dir, '/val/')
+            test_img_dir = os.path.join(read_dir, '/test/')
+
+            h5_path = os.path.join(read_dir, "fer2013.h5")
 
             train_ds = FER2013_Dataset(csv_file=train_csv_file,
                                     img_dir=train_img_dir,
                                     datatype="train",
-                                    h5_path="/content/gdrive/MyDrive/FER_2013/fer2013.h5")
+                                    h5_path=h5_path)
             val_ds = FER2013_Dataset(csv_file=val_csv_file,
                                     img_dir=val_img_dir,
                                     datatype="val",
-                                    h5_path="/content/gdrive/MyDrive/FER_2013/fer2013.h5")
+                                    h5_path=h5_path)
             test_ds = FER2013_Dataset(csv_file=test_csv_file,
                                     img_dir=test_img_dir,
                                     datatype="test",
-                                    h5_path="/content/gdrive/MyDrive/FER_2013/fer2013.h5")
+                                    h5_path=h5_path)
             return train_ds, val_ds, test_ds
 
 

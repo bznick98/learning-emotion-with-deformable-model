@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchinfo import summary
-from torch.utils.data import DataLoader, random_split, SubsetRandomSampler, Subset
+from torch.utils.data import DataLoader, random_split, SubsetRandomSampler, Subset, ConcatDataset
 from torchvision import transforms
 from tqdm import tqdm
 from sklearn.model_selection import KFold
@@ -84,7 +84,16 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
     # convert list to Compose functinos
     augmentations = transforms.Compose(augmentations)
 
-    for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
+    # if using FER2013, we don't need k-fold split, just using its own train/val split
+    if len(dataset) == 3:
+        train_subset, val_subset, test_subset = dataset
+        dataset = ConcatDataset([train_subset, val_subset])
+        train_val_split = [(np.arange(len(train_subset)), np.arange(len(train_subset), len(train_subset) + len(val_subset)))]
+    else:
+        # k-fold random split
+        train_val_split = splits.split(np.arange(len(dataset)))
+
+    for fold, (train_idx, val_idx) in enumerate(train_val_split):
         # copy from clean model
         net = choose_model(args, input_size)
         net.to(device)
@@ -97,8 +106,6 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
         # Loss
         criterion = nn.CrossEntropyLoss()
 
-        # print model info
-        print(f"=================================== Start Training fold {fold+1}/{k} ===================================")
         # k-folds sampling
         train_subset = Subset(dataset, train_idx)
         val_subset = Subset(dataset, val_idx)
@@ -115,6 +122,9 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
         val_loader = DataLoader(val_subset, batch_size=batch_size)
         train_len = len(train_subset)
         val_len = len(val_subset)
+
+        # print model info
+        print(f"=================================== Start Training fold {fold+1}/{k} ===================================")
 
         train_loss_arr = []
         val_loss_arr = []
@@ -175,7 +185,10 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
 if __name__ == "__main__":
     # choose dataset based on args config
     dataset = choose_dataset(args)
-    img_size = dataset[0][0].detach().numpy().shape[1:]   # 2d image size (48x48) or (224x224)
+    try:
+        img_size = dataset[0][0].detach().numpy().shape[1:]   # 2d image size (48x48) or (224x224)
+    except:
+        img_size = dataset[0][0][0].detach().numpy().shape[1:]         # if using FER2013, dataset will be a 3-tuple
 
     # augmentation will have final training image size => img_size
     augment_list, img_size = get_augmentations(args, input_size=img_size)
