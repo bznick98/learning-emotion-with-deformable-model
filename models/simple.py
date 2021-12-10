@@ -7,9 +7,10 @@ class Simple_CNN(nn.Module):
     """
     Simple CNN, to test if simple model still overfits data
     """
-    def __init__(self):
+    def __init__(self, drop=0):
         '''
         input: Nx1x48x48
+            - drop: dropout rate before 1st FC layer
         '''
         super().__init__()
 
@@ -28,6 +29,7 @@ class Simple_CNN(nn.Module):
         self.flatten = nn.Flatten()
         # handle 48x48 input
         self.fc1 = nn.Linear(5 * 5 * 32, 32)
+        self.dropout = nn.Dropout(drop)
         self.bn_fc = nn.BatchNorm1d(32)
         self.fc2 = nn.Linear(32,7)
 
@@ -52,7 +54,7 @@ class Simple_CNN(nn.Module):
         out = self.flatten(out)
         out = F.relu(self.fc1(out))
         out = self.bn_fc(out)
-        out = F.dropout(out)
+        out = self.dropout(out)
         out = self.fc2(out)
         out = F.dropout(out)
 

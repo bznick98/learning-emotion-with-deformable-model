@@ -5,10 +5,14 @@ import torch.nn.functional as F
 from models.dcn import DeformableConv2d
 
 class Deep_Emotion(nn.Module):
-    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False, drop=0.5):
+    def __init__(self, wider=False, deeper=False, de_conv=False, input_224=False, drop=0):
         '''
         Deep_Emotion (wider)
-        input: Nx1x48x48
+        input: (NxCx48x48) (can accept 224x224 input if input_224 set to True)
+            - wider: if enabled, channel=10 will be replaced by channel=64
+            - deeper: if enabled, 2 more conv layers (does not give too much difference)
+            - de_conv: if enabled, conv layer 3,4 will be replaced by deformable convolution (slower computation)
+            - drop: dropout rate when training
         '''
         super(Deep_Emotion,self).__init__()
         self.wider = wider
@@ -27,8 +31,8 @@ class Deep_Emotion(nn.Module):
 
         # replace conv3/4 with deformable convolution
         if de_conv:
-            self.de_conv3 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
-            self.de_conv4 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
+            self.conv3 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
+            self.conv4 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
 
         self.conv3 = nn.Conv2d(ch,ch,3)    # 20x20xch   /   108x108xch
         self.bn3 = nn.BatchNorm2d(ch) 
@@ -100,57 +104,11 @@ class Deep_Emotion(nn.Module):
         out = self.bn2(out)
         out = self.pool2(out)
 
-        # if using deformable convolution (only for 3/4 layer)
-        if self.de_conv:
-            out = F.relu(self.de_conv3(out))
-            out = self.bn3(out)
-            out = F.relu(self.de_conv4(out))
-            out = self.bn4(out)
-            out = self.pool4(out)
-        else:
-            out = F.relu(self.conv3(out))
-            out = self.bn3(out)
-            out = F.relu(self.conv4(out))
-            out = self.bn4(out)
-            out = self.pool4(out)
-
-        # deeper
-        if self.deeper:
-            out = F.relu(self.conv5(out))
-            out = self.bn5(out)
-
-            out = F.relu(self.conv6(out))
-            out = self.bn6(out)
-
-        # out = out.view(-1, 1327104)
-        out = self.flatten(out)
-        out = F.relu(self.fc1(out))
-        out = self.bn_fc(out)
-        out = self.dropout(out)
-        out = self.fc2(out)
-
-        return out
-
-    def forward_1208_1021AM(self,input):
-        out = self.stn(input)
-
-        out = F.relu(self.conv1(out))
-        out = self.bn1(out)
-        out = self.conv2(out)
-        out = self.bn2(out)
-        out = F.relu(self.pool2(out))
-
-        # if using deformable convolution (only for 3/4 layer)
-        if self.de_conv:
-            out = F.relu(self.de_conv3(out))
-            out = self.bn3(out)
-            out = self.bn4(self.de_conv4(out))
-            out = F.relu(self.pool4(out))
-        else:
-            out = F.relu(self.conv3(out))
-            out = self.bn3(out)
-            out = self.bn4(self.conv4(out))
-            out = F.relu(self.pool4(out))
+        out = F.relu(self.conv3(out))
+        out = self.bn3(out)
+        out = F.relu(self.conv4(out))
+        out = self.bn4(out)
+        out = self.pool4(out)
 
         # deeper
         if self.deeper:
@@ -172,10 +130,12 @@ class Deep_Emotion(nn.Module):
 
 
 class Deep_Emotion224(nn.Module):
-    def __init__(self, de_conv=False, drop=0.5):
+    def __init__(self, de_conv=False, drop=0):
         '''
-        Deep_Emotion (wider)
-        input: Nx1x224x224
+        Deep_Emotion, designed for 224x224 input, channels are wider than baseline Deep_Emotion
+        input: (NxCx224x224)
+            - de_conv: if enabled, conv layer 3,4,5 will be replaced by deformable convolution (slower computation)
+            - drop: dropout rate when training
         '''
         super().__init__()
 
@@ -276,7 +236,7 @@ class Deep_Emotion224(nn.Module):
         out = self.bn7(out)
         out = self.pool7(out)
 
-        # 8 reduce features
+        # 8 reduce features using 1x1 conv
         out = F.relu(self.conv8(out))
         out = self.bn8(out)
         out = self.pool8(out)

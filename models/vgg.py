@@ -4,6 +4,10 @@ import torchvision
 
 
 class VggFeatures(nn.Module):
+    """
+    Vgg network
+    input: (NxCx224x224)
+    """
     def __init__(self, drop=0.2):
         super().__init__()
 
