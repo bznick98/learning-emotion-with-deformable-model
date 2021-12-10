@@ -184,7 +184,7 @@ def device_setup():
     return device
 
 
-def plot(history):
+def plot(history, save=None):
     # Plotting loss/acc
     import matplotlib.pyplot as plt
 
@@ -220,6 +220,9 @@ def plot(history):
 
     print(f"{len(train_acc_kfolds)}-fold average Training Acc = {avg_train_acc}")
     print(f"{len(val_acc_kfolds)}-fold average Validation Acc = {avg_val_acc}")
+
+    if save:
+        plt.savefig(f'acc-loss-e{epochs}.png')
 
 
 
