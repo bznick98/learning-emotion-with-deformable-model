@@ -21,7 +21,7 @@ from datasets.map_dataset import MapDataset
 # parsing args
 parser = argparse.ArgumentParser(description="Configuration of setup and training process")
 parser.add_argument('-s', '--setup', action='store_true', help='setup the dataset for the first time')
-parser.add_argument('-d', '--data', type=str, default='/content/gdrive/MyDrive/',
+parser.add_argument('-d', '--data', type=str, default='/content/gdrive/MyDrive/CK_PLUS/',
                             help='Image folders for loading data, can be:\n\
                                 FER2013: folder path that contains csv that downloaded from kaggle (icml_face_data.csv)\n\
                                 FER_CKPLUS: folder path that contains 8 subfolders\n\

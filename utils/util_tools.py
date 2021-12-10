@@ -3,6 +3,7 @@ Utility tools used for training
 """
 import torch
 import os
+import numpy as np
 from tqdm import tqdm
 from torchvision import transforms
 
