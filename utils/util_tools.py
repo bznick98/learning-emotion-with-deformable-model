@@ -64,7 +64,7 @@ def choose_dataset(args):
             read_dir = args.data
         else:
             read_dir = "/content/gdrive/MyDrive/CK_PLUS/" # read from google drive
-        ds = FER_CKPLUS_Dataset(img_dir=read_dir, h5_path=os.path.join(read_dir, "CK_PLUS.h5"), transform=[transforms.RandomHorizontalFlip()])
+        ds = FER_CKPLUS_Dataset(img_dir=read_dir, h5_path=os.path.join(read_dir, "CK_PLUS.h5"))
 
     else:
         raise Exception("-d or --data can only be \{FER2013, FER_CKPLUS, CK_PLUS\}")
