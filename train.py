@@ -84,7 +84,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
 
     for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
         # copy from clean model
-        net = choose_model(args)
+        net = choose_model(args, input_size)
         net.to(device)
 
         # Optimizer
