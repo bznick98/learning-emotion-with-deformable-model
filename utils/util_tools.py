@@ -210,7 +210,6 @@ def plot(history, save=None):
     for val_acc_arr in val_acc_kfolds:
         axes[3].plot(xs, val_acc_arr)
     axes[3].set_title("Val Accuracy vs epochs")
-    plt.show()
 
     # Average Acc for K-folds from LAST epoch
     # avg_train_acc = sum([arr[-1] for arr in train_acc_kfolds]) / len(train_acc_kfolds)
@@ -226,6 +225,7 @@ def plot(history, save=None):
     if save:
         plt.savefig(f'acc-loss-e{epochs}.png')
         print(f"Plot saved")
+    plt.show()
 
 
 
