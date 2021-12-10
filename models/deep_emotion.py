@@ -29,16 +29,16 @@ class Deep_Emotion(nn.Module):
         self.bn2 = nn.BatchNorm2d(ch)     
         self.pool2 = nn.MaxPool2d(2,2)      # 22x22xch  /   110x110xch
 
-        # replace conv3/4 with deformable convolution
-        if de_conv:
-            self.conv3 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
-            self.conv4 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
-
         self.conv3 = nn.Conv2d(ch,ch,3)    # 20x20xch   /   108x108xch
         self.bn3 = nn.BatchNorm2d(ch) 
         self.conv4 = nn.Conv2d(ch,ch,3)    # 18x18xch   /   106x106xch
         self.bn4 = nn.BatchNorm2d(ch)  
         self.pool4 = nn.MaxPool2d(2,2)     # 9x9xch     /   53x53xch
+
+        # replace conv3/4 with deformable convolution
+        if de_conv:
+            self.conv3 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
+            self.conv4 = DeformableConv2d(in_channels=ch, out_channels=ch, kernel_size=3, stride=1, padding=0)
 
         self.dropout = nn.Dropout(drop)    # use nn.Dropout instead of F.dropout
 
