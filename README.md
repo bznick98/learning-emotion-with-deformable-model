@@ -10,11 +10,14 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - *large*
   - 28709 training images
   - 3589 validation images
+  - 7 labels
 - [**FER_CK_PLUS**](https://www.kaggle.com/sudarshanvaidya/corrective-reannotation-of-fer-ck-kdef)
   - 48x48
   - *large*
   - cleaned version of FER2013, plus CK+ images and a dataset called kdef?
   - higher quality than FER2013
+  - 8 labels, ignoring `contempt` since it's not in FER2013
+  - The rest: `anger`, `disgust`, `fear`, `happiness`, `sadness`,`surprise`, `neutrality`
 - [**CK_PLUS**](https://drive.google.com/drive/folders/1W-dl_w1ynzEDUhiOCMjbCcYwmaoZppRN?usp=sharing)
   - 256x256
   - *small*
@@ -22,6 +25,7 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - 32 validation images
   - unstable validation :(
   - achieves highest accuracy
+  - 7 labels: `anger`, `disgust`, `fear`, `happiness`, `sadness`,`surprise`, `neutrality`
 
 # Models
 ### Architectures
