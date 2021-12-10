@@ -80,6 +80,9 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
     max_val_acc_kfolds = []
 
     summary(net, input_size=(batch_size, 1, input_size[0], input_size[1]), verbose=1)
+    
+    # convert list to Compose functinos
+    augmentations = transforms.Compose(augmentations)
 
     for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
         # Optimizer
@@ -98,7 +101,6 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
 
         # augment training set
         if augmentations:
-            augmentations = transforms.Compose(augmentations)
             train_subset = MapDataset(train_subset, augmentations)
         # if there is resize, resize both training and validation data
         if args.resize > 0:
