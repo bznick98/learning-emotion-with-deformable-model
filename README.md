@@ -71,7 +71,7 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
     - Both training and validation images will be resized to (X, X)
 
 # How to Run
-## Train
+### Train
 - `-d` specifies the directory stored specific dataset, like `fer2013/`,  `fer_ckplus_kef/` and `CK_PLUS/`. I put all those data under `./data/`, so `-d data/CK_PLUS` if we want to use `CK_PLUS`.
 - `-ds`, acutually a little bit redundant? specifies which dataset we want to use, a `str`, can only be one of {`FER2013`, `FER_CKPLUS`, `CK_PLUS`}
 - `-m` specifies model we want to use, can only be one of {`de`, `de224`, `vgg`, `simple`}
