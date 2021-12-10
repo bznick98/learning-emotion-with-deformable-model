@@ -5,17 +5,19 @@ The repo for 2021 Fall CS269 Final Project: Learning Face Emotions with Deformab
 Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
 
 # Dataset
-- [FER2013](https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data)
+- [**FER2013**](https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data)
   - 48x48
+  - *large*
   - 28709 training images
   - 3589 validation images
-- [FER_CK_PLUS](https://www.kaggle.com/sudarshanvaidya/corrective-reannotation-of-fer-ck-kdef)
+- [**FER_CK_PLUS**](https://www.kaggle.com/sudarshanvaidya/corrective-reannotation-of-fer-ck-kdef)
   - 48x48
+  - *large*
   - cleaned version of FER2013, plus CK+ images and a dataset called kdef?
   - higher quality than FER2013
-- [CK_PLUS](https://drive.google.com/drive/folders/1W-dl_w1ynzEDUhiOCMjbCcYwmaoZppRN?usp=sharing)
+- [**CK_PLUS**](https://drive.google.com/drive/folders/1W-dl_w1ynzEDUhiOCMjbCcYwmaoZppRN?usp=sharing)
   - 256x256
-  - tiny image dataset
+  - *small*
   - 297 training images
   - 32 validation images
   - unstable validation :(
@@ -23,43 +25,43 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
 
 # Models
 ### Architectures
-- Deep_Emotion
+- **Deep_Emotion**
   - have 224x224 input version and 48x48 input version.
   - if choosing 224x224 as input, large portion of parameters will be in fc layers.
   - added BatchNorm after every Conv/FC compared to original deep emotion.
-- Deep_Emotion224
+- **Deep_Emotion224**
   - dedicated for 224x224 input.
   - added/re-ordered layers, so that parameters are more evenly spread between Conv and FC layer.
   - No significant performance boost.
-- VGG
+- **VGG**
   - really big model, might overfit.
-- Simple_CNN
+- **Simple_CNN**
   - 3 Conv layers + 2 FC layers
   - simple network to test avoid overfitting
 
 ### Optional Components *(recommended)*
-- Deformable Convolution Layers
+- **Deformable Convolution Layers**
   - Can be enabled by setting `-dc` or `--de_conv`
   - Improves `val acc` by roughly 3%~4%.
   - Theoretically improves localization ability of the model.
-- Wider Deep Emotion 
+- **Wider Deep Emotion**
   - Can be enabled by setting `-wide` or `--wide`
   - Original deep emotion has `channel=10` for Conv layers, enabling this changes `channel=64`, have bigger model capacity.
-- Dropout Layer
+- **Dropout Layer**
   - By default has 1 dropout layer after 1st fc layer.
   - Can add an extra by setting `-n_drop 2`
   - All dropout rates are controlled by `-drop 0.5`
 
 # Training
 ### Training tricks
-- Learning Rate Scheduler
+- **Learning Rate Scheduler**
   - Can be enabled by setting `-lrsc`
   - Uses PyTorch's `ReduceLROnPlateau()`
   - With `patience=20` and `min_lr=1e-7`
-- Weight Decay
+- **Weight Decay**
   - Can be enabled by setting `-wd 1e-4` (or any number)
   - L2 Regularization, reduce overfitting.
-- Data Augmentations
+- **Data Augmentations**
   - `RandomHorizontalFlip(0.5)`
     - Can be enabled by setting `-hflip`
   - `RandomCrop(X)`
@@ -68,7 +70,7 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - `RandomColorJitter(X,Y,Z)`
     - Can be enabled by setting `-rjitter`
     - X in [0,1], jittering brightness, can be set by `-rjitter_b X`
-- Data Processing
+- **Data Processing**
   - `Resize`
     - Can be set by `-resize X`
     - Both training and validation images will be resized to (X, X)
