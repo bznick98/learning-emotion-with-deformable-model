@@ -60,7 +60,7 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - Uses PyTorch's `ReduceLROnPlateau()`
   - With `patience=20` and `min_lr=1e-7`
 - Weight Decay
-  - Can be enabled by setting `-wd X`
+  - Can be enabled by setting `-wd X` or `--weight_decay X`
   - X default = `1e-4`
   - L2 Regularization, reduce overfitting.
 - Data Augmentations
