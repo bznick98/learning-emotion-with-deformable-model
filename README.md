@@ -15,7 +15,7 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - 48x48
   - *large*
   - 8 labels, ignoring `contempt` since it's not in FER2013
-  - The rest: `anger`, `disgust`, `fear`, `happiness`, `sadness`,`surprise`, `neutrality`
+  - The rest: `anger`, `disgust`, `fear`, `happiness`, `sadness`, `surprise`, `neutrality`
   - cleaned version of FER2013, plus CK+ images and a dataset called kdef?
   - higher quality than FER2013
 - [**CK_PLUS**](https://drive.google.com/drive/folders/1W-dl_w1ynzEDUhiOCMjbCcYwmaoZppRN?usp=sharing)
@@ -23,7 +23,7 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - *small*
   - 297 training images
   - 32 validation images
-  - 7 labels: `anger`, `disgust`, `fear`, `happiness`, `sadness`,`surprise`, `neutrality`
+  - 7 labels: `anger`, `disgust`, `fear`, `happiness`, `sadness`, `surprise`, `neutrality`
   - unstable validation :(
   - achieves highest accuracy
 
