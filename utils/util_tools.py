@@ -115,9 +115,7 @@ def get_augmentations(args, input_size):
     if args.random_crop:
         aug_list.append(transforms.RandomCrop(args.random_crop_size))
 
-    # if specified resize size, otherwise resize will be loaded image size
-    aug_list.append(transforms.Resize(out_size))
-    
+    # if specified resize size, otherwise resize will be loaded image size    
     return aug_list, out_size
 
 

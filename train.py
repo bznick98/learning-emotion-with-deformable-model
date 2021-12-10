@@ -95,10 +95,16 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
         # k-folds sampling
         train_subset = Subset(dataset, train_idx)
         val_subset = Subset(dataset, val_idx)
+
         # augment training set
         if augmentations:
             augmentations = transforms.Compose(augmentations)
             train_subset = MapDataset(train_subset, augmentations)
+        # if there is resize, resize both training and validation data
+        if args.resize > 0:
+            train_subset = MapDataset(train_subset, [transforms.Resize((args.resize, args.resize))])
+            val_subset = MapDataset(val_subset, [transforms.Resize((args.resize, args.resize))])
+
         train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
         val_loader = DataLoader(val_subset, batch_size=batch_size)
         train_len = len(train_subset)
