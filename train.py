@@ -1,136 +1,185 @@
 import argparse
 import numpy as np
+import gc
 from PIL import Image
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchinfo import summary
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split, SubsetRandomSampler, Subset
 from torchvision import transforms
 from tqdm import tqdm
+from sklearn.model_selection import KFold
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-# data
-from dataloaders.fer_ckplus_kdef import FER_CKPLUS_Dataloader
-from dataloaders.fer2013 import FER2013_Dataloader
+# utility tools
+from utils.util_tools import choose_dataset, choose_model, train_epoch, val_epoch, device_setup, get_augmentations
+from datasets.map_dataset import MapDataset
 
-# model
-from models.deep_emotion import Deep_Emotion
-from models.vgg import Vgg
 
 
 # parsing args
 parser = argparse.ArgumentParser(description="Configuration of setup and training process")
 parser.add_argument('-s', '--setup', action='store_true', help='setup the dataset for the first time')
-parser.add_argument('-d', '--data', type=str, default='FER2013',
-                            help='data folder that contains data files that downloaded from kaggle (icml_face_data.csv)')
-parser.add_argument('--model', type=str, default='de', help='DL model to run, can be one of {de, vgg}')
+parser.add_argument('-d', '--data', type=str, default='/content/gdrive/MyDrive/',
+                            help='Image folders for loading data, can be:\n\
+                                FER2013: folder path that contains csv that downloaded from kaggle (icml_face_data.csv)\
+                                FER_CKPLUS: folder path that contains 8 subfolders\
+                                CK_PLUS: folder path that contains 7 subfolders')
+parser.add_argument('-ds', '--dataset', type=str, default='CK_PLUS', help='choice of \{FER2013, FER_CKPLUS, CK_PLUS\}')
+parser.add_argument('-b', '--big', action='store_true', help='if enabled, input data will be treated as 224x224 (only for CK_PLUS dataset)')
+
+# model arch settings
+parser.add_argument('-m', '--model', type=str, default='de', help='DL model to run, can only be one of {de, de224, vgg, simple}')
+parser.add_argument('-lrsc', '--schedule', action='store_true', help='if enabled, lr will be scheduled using ReduceLROnPlateau')
+parser.add_argument('-dc', '--de_conv', action='store_true', help='if enabled, replacing (some) conv with deformable conv')
+parser.add_argument('-wide', '--wide', action='store_true', help='if enabled, deep_emotion will be wider, increase channel=>64')
+parser.add_argument('-deep', '--deep', action='store_true', help='if enabled, deep_emotion will be deeper, add 2 more conv layers')
+
+# hyperparameters
+parser.add_argument('-k', '--k_fold', type=int, default=0, help= 'k-fold cross validation, if=0, do normal training')
 parser.add_argument('-e', '--epochs', type=int, default=100, help= 'number of epochs')
-parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001, help='value of learning rate')
+parser.add_argument('-lr', '--learning_rate', type=float, default=1e-4, help='value of learning rate')
 parser.add_argument('-bs', '--batch_size', type=int, default=128, help='training/validation batch size')
 parser.add_argument('-wd', '--weight_decay', type=float, default=1e-4, help='weight decay coeff(L2 regularization)')
+parser.add_argument('-drop', '--dropout', type=float, default=0, help='dropout rate, 0-1, 0=no dropout')
+
 parser.add_argument('--show', action='store_true', help='Show 1 training sample.')
-args = parser.parse_args([])  
-
-# cpu/gpu device setup
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print('Using device:', device)
-print()
-#Additional Info when using cuda
-if device.type == 'cuda':
-    print(torch.cuda.get_device_name(0))
-    print('Memory Usage:')
-    print('Allocated:', round(torch.cuda.memory_allocated(0)/1024**3,1), 'GB')
-    print('Cached:   ', round(torch.cuda.memory_reserved(0)/1024**3,1), 'GB')
+args = parser.parse_args()
 
 
-def Train(epochs, data_loader, criterion, optmizer, device):
+
+def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_224=False, lr_schedule=False, augmentations=None):
     '''
     Training Loop
     '''
-    print("===================================Start Training===================================")
-    train_loader = data_loader.train_loader
-    val_loader = data_loader.val_loader
-    train_len = data_loader.train_len
-    val_len = data_loader.val_len
+    # setting up device
+    device = device_setup()
 
-    train_loss_arr = []
-    val_loss_arr = []
-    train_acc_arr = []
-    val_acc_arr = []
+    net.to(device)
 
-    for e in range(epochs):
-        train_loss = 0
-        validation_loss = 0
-        train_correct = 0
-        val_correct = 0
-        # Train the model  #
-        net.train()
-        with tqdm(train_loader, unit="batch") as tepoch:
-            for data, labels in tepoch:
-                data, labels = data.to(device), labels.to(device)
-                optmizer.zero_grad()
-                outputs = net(data)
-                loss = criterion(outputs,labels)
-                loss.backward()
-                optmizer.step()
-                train_loss += loss.item()
-                _, preds = torch.max(outputs,1)
-                train_correct += torch.sum(preds == labels.data)
+    if input_224:
+        input_size = (224, 224)
+    else:
+        input_size = (48, 48)
 
-        #validate the model#
-        net.eval()
-        for data,labels in val_loader:
-            data, labels = data.to(device), labels.to(device)
-            val_outputs = net(data)
-            val_loss = criterion(val_outputs, labels)
-            validation_loss += val_loss.item()
-            _, val_preds = torch.max(val_outputs,1)
-            val_correct += torch.sum(val_preds == labels.data)
+    # K-Folds split cross validation
+    if k == 0:
+        splits=KFold(n_splits=10,shuffle=True)
+    else:
+        splits=KFold(n_splits=k,shuffle=True)
 
-        train_loss = train_loss/train_len
-        train_acc = train_correct.double() / train_len
-        validation_loss =  validation_loss / val_len
-        val_acc = val_correct.double() / val_len
-        print('Epoch: {} \tTraining Loss: {:.8f} \tValidation Loss {:.8f} \tTraining Acuuarcy {:.3f}% \tValidation Acuuarcy {:.3f}%'
-                                                           .format(e+1, train_loss,validation_loss,train_acc * 100, val_acc*100))
+    train_loss_kfolds = []
+    val_loss_kfolds = []
+    train_acc_kfolds = []
+    val_acc_kfolds = []
+    max_train_acc_kfolds = []
+    max_val_acc_kfolds = []
 
-        # save for plotting
-        train_loss_arr.append(train_loss)
-        train_acc_arr.append(train_acc)
-        val_loss_arr.append(validation_loss)
-        val_acc_arr.append(val_acc)
+    for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
+        # Optimizer
+        optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=wd)
+        if lr_schedule:
+          scheduler = ReduceLROnPlateau(optimizer, 'min', patience=20, verbose=1, min_lr=1e-7)
 
-    torch.save(net.state_dict(),'deep_emotion-{}-{}-{}.pt'.format(epochs,batchsize,lr))
-    print("===================================Training Finished===================================")
-    return train_loss_arr, train_acc_arr, val_loss_arr, val_acc_arr
+        # Loss
+        criterion = nn.CrossEntropyLoss()
+
+        # print model info
+        if fold == 0: summary(net, input_size=(batch_size, 1, input_size[0], input_size[1]), verbose=1)
+
+        print(f"=================================== Start Training fold {fold+1}/{k+1} ===================================")
+        # k-folds sampling
+        train_subset = Subset(dataset, train_idx)
+        val_subset = Subset(dataset, val_idx)
+        # augment training set
+        if augmentations:
+          train_subset = MapDataset(train_subset, augmentations)
+        train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(val_subset, batch_size=batch_size)
+        train_len = len(train_subset)
+        val_len = len(val_subset)
+
+        train_loss_arr = []
+        val_loss_arr = []
+        train_acc_arr = []
+        val_acc_arr = []
+
+        max_train_acc = 0
+        max_val_acc = 0
+
+        for e in range(epochs):
+            # train the model (train epoch)
+            train_loss, train_acc = train_epoch(net, criterion, device, train_loader, train_len, optimizer)
+
+            # validate the model (validate epoch)
+            val_loss, val_acc = val_epoch(net, criterion, device, val_loader, val_len)
+
+            # record the max train/val accuracy acchieved of all time
+            max_train_acc = max(max_train_acc, train_acc)
+            max_val_acc = max(max_val_acc, val_acc)
+
+            # learning rate scheduler
+            if lr_schedule:
+              scheduler.step(val_loss)
+
+            # epoch info
+            print(f'Epoch: {e+1} \tTraining Loss: {train_loss:.8f} \tValidation Loss {val_loss:.8f} \tTraining Accuarcy {train_acc*100:.3f}% \tValidation Accuarcy {val_acc*100:.3f}%')
+
+            # save for plotting
+            train_loss_arr.append(train_loss)
+            train_acc_arr.append(train_acc)
+            val_loss_arr.append(val_loss)
+            val_acc_arr.append(val_acc)
+        
+
+        # history for each fold
+        train_loss_kfolds.append(train_loss_arr)
+        val_loss_kfolds.append(val_loss_arr)
+        train_acc_kfolds.append(train_acc_arr)
+        val_acc_kfolds.append(val_acc_arr)
+        max_train_acc_kfolds.append(max_train_acc)
+        max_val_acc_kfolds.append(max_val_acc)
+
+        torch.save(net.state_dict(),'deep_emotion-{}-{}.pt'.format(epochs, batch_size))
+        # clean-up after all epoch
+        torch.cuda.empty_cache()
+
+        # normal training ends here (using 10-fold split, but run 1 time)
+        if k == 0:
+            break
+
+    return train_loss_kfolds, train_acc_kfolds, val_loss_kfolds, val_acc_kfolds, max_train_acc_kfolds, max_val_acc_kfolds
+
+
+
+
 
 
 if __name__ == "__main__":
-    # Choosing model
-    if args.model == 'de':
-        net = Deep_Emotion(wider=False, deeper=False, de_conv=False)
-    elif args.model == 'vgg':
-        net = Vgg()
-    else:
-        raise Exception("--model can only accpet one of \{de, vgg\}")
-    net.to(device)
+    # choose model based on args config
+    net = choose_model(args)
 
-    # Choosing dataset
-    if args.data == "FER2013": # FER2013
-        summary(net, input_size=(args.batchsize, 1, 48, 48), verbose=1)
-        dl = FER2013_Dataloader(data_dir="./data/fer2013", gen_data=args.setup, batchsize=args.batchsize)
-    elif args.data == "FER_CKPLUS": # FER_CKPLUS
-        dl = FER_CKPLUS_Dataloader(data_dir="./data/fer_ckplus_kdef/", resize=(48,48), augment=True, batchsize=args.batchsize, h5_path="/content/gdrive/MyDrive/FER_CKPLUS/fer_ckplus.h5")
-        summary(net, input_size=(args.batchsize, 1, 48, 48), verbose=1)
-    elif args.data == "CK_PLUS":
-        dl = FER_CKPLUS_Dataloader(data_dir="./data/CK_PLUS/", resize=(48,48), augment=True, batchsize=args.batchsize)
-        summary(net, input_size=(args.batchsize, 1, 48, 48), verbose=1)
-    else:
-        raise Exception("-d or --data can only be \{FER2013, FER_CK\}")
+    # choose dataset based on args config
+    dataset = choose_dataset(args)
 
-    # Loss
-    criterion = nn.CrossEntropyLoss()
-    # Optimizer
-    optmizer = optim.Adam(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    history = Train(args.epochs, dl, criterion, optmizer, device)
+    # prepare data augmentations
+    augment_list = get_augmentations(args)
+    
+    # train cross validation (currently only support CK_PLUS)
+    # k-fold cross validation
+    history = train_kfold(net=net,
+                            epochs=args.epochs,
+                            dataset=dataset,
+                            batch_size=args.batch_size,
+                            lr=args.learning_rate,
+                            wd=args.weight_decay,
+                            k=args.k_fold,
+                            input_224=args.big,
+                            lr_schedule=args.schedule,
+                            augmentations=augment_list)
+
+
+    # plot
+
     
