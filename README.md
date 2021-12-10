@@ -91,6 +91,9 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
 
 ```python train.py -d data/CK_PLUS -ds CK_PLUS -m de -dc -wide -n_drop 2 -drop 0.4 -rcrop -rcrop_size 224 -hflip -resize 48```
 
+### Run on colab (CLI version)
+* https://colab.research.google.com/drive/18ZvSw12sYvG73KlNJ2n77IGPkJln1HO7?usp=sharing
+
 ### Project Structures
 * all DL model classes are under models/
 * all custom dataset classes are under datasets/
