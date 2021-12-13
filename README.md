@@ -24,14 +24,14 @@ Yu Hou, Xueer Li, Zongnan Bao, Xiaoyang Yu, Felix Zhang
   - 297 training images
   - 32 validation images
   - 7 labels: `anger`, `disgust`, `fear`, `happiness`, `sadness`, `surprise`, `neutrality`
-  - unstable validation :(
-  - achieves highest accuracy
-  - NOTE: be sure to add `-resize 224` if you want to use it on models that expect 224 input, another option is to add `-rcrop_size 224`
+  - unstable validation metrics since validations set is fairly small :(
+  - achieves highest accuracy (easist to train?)
+  - NOTE: be sure to add `-resize 224` if you want to use CK_PLUS(256x256) on models that expect 224 input, another option is to add `-rcrop_size 224`
 
 # Models
 ### Architectures
 - **Deep_Emotion**
-  - have both 224x224 input version and 48x48 input version.
+  - have both 224x224-input version and 48x48-input version.
   - if choosing 224x224 as input, large portion of parameters will be in fc layers. 
   - added BatchNorm after every Conv/FC compared to original deep emotion.
 - **Deep_Emotion224**
