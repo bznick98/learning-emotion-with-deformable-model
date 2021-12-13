@@ -1,3 +1,4 @@
+![](https://visitor-badge.glitch.me/badge?page_id=bznick98.learning-emotion-with-deformable-model)
 # Learning Face Emotions with Deformable Model
 
 The repo for 2021 Fall CS269 Final Project: Learning Face Emotions with Deformable Model. 
