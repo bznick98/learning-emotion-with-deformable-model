@@ -75,7 +75,6 @@ class FER_CKPLUS_Dataset(Dataset):
                 else:
                     continue
                 for file in tqdm(os.listdir(img_dir + "/" + dir), desc=f"Loading {dir}"):
-                    if file.endswith("jpg"):
 #                         # filename, ext = file.split(".")
 #                         contour_filepath = os.path.join(img_dir, dir, file)
 #                         img_filepath = os.path.join(img_dir, dir, file[:-11], ".png")
@@ -92,17 +91,17 @@ class FER_CKPLUS_Dataset(Dataset):
 # #                             except:
 # #                                 raise Exception(f"Reading contour enabled, but contour file: {contour_filepath} not present.")
 #                                                 # filename, ext = file.split(".")
-                        filename, ext = file.split(".")
-                        img_filepath = os.path.join(img_dir, dir, file)
+                    filename, ext = file.split(".")
+                    img_filepath = os.path.join(img_dir, dir, file)
 
-                        with Image.open(img_filepath) as img:
-                            if filename.endswith("_result"):
-                                # reading contours
-                                self.contours.append(np.array(img))
-                            else:
-                                # reading image and label
-                                self.imgs.append(np.array(img))
-                                self.labels.append(curr_label)
+                    with Image.open(img_filepath) as img:
+                        if filename.endswith("_result"):
+                            # reading contours
+                            self.contours.append(np.array(img))
+                        else:
+                            # reading image and label
+                            self.imgs.append(np.array(img))
+                            self.labels.append(curr_label)
 
 
     def show(self):
@@ -127,6 +126,7 @@ class FER_CKPLUS_Dataset(Dataset):
             self.imgs = hf['imgs'][:]
             self.labels = hf['labels'][:]
             self.contours = hf['contours'][:]
+
     def __len__(self):
         return len(self.labels)
 
