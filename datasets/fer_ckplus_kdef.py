@@ -136,13 +136,13 @@ class FER_CKPLUS_Dataset(Dataset):
         label = self.labels[idx]
         img = self.transform(img)
         contour = self.transform(contour)
-        print("TRANSFROMED SHAPE: ", img.shape, contour.shape)
-        height = img.shape[0]
-        width = img.shape[1]
-        combine = np.zeros((height, width, 2))
-        combine[:,:,0]=img
-        combine[:,:,1]= contour
-        return combine, label 
+        # height = img.shape[0]
+        # width = img.shape[1]
+        # combine = np.zeros((height, width, 2))
+        # combine[:,:,0]=img
+        # combine[:,:,1]= contour
+        combined = np.concatenate((img, contour))
+        return combined, label 
 
         
 
