@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
