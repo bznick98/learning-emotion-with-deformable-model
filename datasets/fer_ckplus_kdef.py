@@ -141,7 +141,7 @@ class FER_CKPLUS_Dataset(Dataset):
         # combine = np.zeros((height, width, 2))
         # combine[:,:,0]=img
         # combine[:,:,1]= contour
-        combined = np.concatenate((img, contour))
+        combined = torch.concatenate((img, contour))
         return combined, label 
 
         
