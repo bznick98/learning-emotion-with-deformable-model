@@ -68,7 +68,7 @@ class Deep_Emotion(nn.Module):
 
         # STN & localization network
         self.localization = nn.Sequential(
-            nn.Conv2d(1, 8, kernel_size=7),     # 42x42xch  /   # 218x218xch
+            nn.Conv2d(input_channel, 8, kernel_size=7),     # 42x42xch  /   # 218x218xch
             nn.MaxPool2d(2, stride=2),          # 21x21xch  /   # 109x109xch
             nn.ReLU(True),
             nn.Conv2d(8, 10, kernel_size=5),    # 16x16xch  /   # 104x104xch
