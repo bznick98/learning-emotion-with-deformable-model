@@ -75,22 +75,35 @@ class FER_CKPLUS_Dataset(Dataset):
                 else:
                     continue
                 for file in tqdm(os.listdir(img_dir + "/" + dir), desc=f"Loading {dir}"):
-                    if file.endwith("jpg"):
-                        # filename, ext = file.split(".")
-                        contour_filepath = os.path.join(img_dir, dir, file)
-                        img_filepath = os.path.join(img_dir, dir, file[:-11], ".png")
+                    if file.endswith("jpg"):
+#                         # filename, ext = file.split(".")
+#                         contour_filepath = os.path.join(img_dir, dir, file)
+#                         img_filepath = os.path.join(img_dir, dir, file[:-11], ".png")
 
-                        # reading image and label
+#                         # reading image and label
+#                         with Image.open(img_filepath) as img:
+#                             self.imgs.append(np.array(img))
+#                             self.labels.append(curr_label)
+# #                         if contour:
+# #                             try:
+#                         # reading corresponding contours
+#                         with Image.open(contour_filepath) as contour:
+#                             self.contours.append(np.array(contour))
+# #                             except:
+# #                                 raise Exception(f"Reading contour enabled, but contour file: {contour_filepath} not present.")
+#                                                 # filename, ext = file.split(".")
+                        filename, ext = file.split(".")
+                        img_filepath = os.path.join(img_dir, dir, file)
+
                         with Image.open(img_filepath) as img:
-                            self.imgs.append(np.array(img))
-                            self.labels.append(curr_label)
-#                         if contour:
-#                             try:
-                        # reading corresponding contours
-                        with Image.open(contour_filepath) as contour:
-                            self.contours.append(np.array(contour))
-#                             except:
-#                                 raise Exception(f"Reading contour enabled, but contour file: {contour_filepath} not present.")
+                            if filename.endswith("_result"):
+                                # reading contours
+                                self.contours.append(np.array(img))
+                            else:
+                                # reading image and label
+                                self.imgs.append(np.array(img))
+                                self.labels.append(curr_label)
+
 
     def show(self):
         pass
@@ -168,7 +181,7 @@ class FER_CKPLUS_Dataset(Dataset):
 
 
 if __name__ == "__main__":
-    dl = FER_CKPLUS_Dataloader("data/CK_PLUS")
+    # dl = FER_CKPLUS_Dataloader("data/CK_PLUS_CONTOUR")
     # test_loader = DataLoader(test_dataset,batch_size=128,shuffle = True,num_workers=0, h5_path="./data/fer_ckplus.h5")
-    dataset = FER_CKPLUS_Dataset("data/CK_PLUS")
-    dataset.save_h5(save_dir="./data/", data_name="CK_PLUS")
+    dataset = FER_CKPLUS_Dataset("data/CK_PLUS_CONTOUR")
+    dataset.save_h5(savepath="./data/CK_PLUS_CONTOUR/CK_PLUS_CONTOUR.h5")
