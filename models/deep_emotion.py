@@ -23,8 +23,11 @@ class Deep_Emotion(nn.Module):
             ch = 64
         else:
             ch = 10
-
-        self.conv1 = nn.Conv2d(1,ch,3)      # 46x46xch  /   222x222xch
+        
+        contour = True # TODO: HARDCODE FOR NOW, MOVE TO ARGS LATER
+        input_channel = 1
+        if contour: input_channel = 2
+        self.conv1 = nn.Conv2d(input_channel,ch,3)      # 46x46xch  /   222x222xch
         self.bn1 = nn.BatchNorm2d(ch)     
         self.conv2 = nn.Conv2d(ch,ch,3)     # 44x44xch  /   220x220xch
         self.bn2 = nn.BatchNorm2d(ch)     
