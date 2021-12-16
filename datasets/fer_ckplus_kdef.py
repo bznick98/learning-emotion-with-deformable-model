@@ -75,21 +75,22 @@ class FER_CKPLUS_Dataset(Dataset):
                 else:
                     continue
                 for file in tqdm(os.listdir(img_dir + "/" + dir), desc=f"Loading {dir}"):
-                    filename, ext = file.split(".")
-                    img_filepath = os.path.join(img_dir, dir, file)
-                    contour_filepath = os.path.join(img_dir, dir, filename+"_result."+ext)
+                    if file.endwith("jpg"):
+                        # filename, ext = file.split(".")
+                        contour_filepath = os.path.join(img_dir, dir, file)
+                        img_filepath = os.path.join(img_dir, dir, file[:-11], ".png")
 
-                    # reading image and label
-                    with Image.open(img_filepath) as img:
-                        self.imgs.append(np.array(img))
-                        self.labels.append(curr_label)
-                    if contour:
-                        try:
-                            # reading corresponding contours
-                            with Image.open(contour_filepath) as contour:
-                                self.contours.append(np.array(contour))
-                        except:
-                            raise Exception(f"Reading contour enabled, but contour file: {contour_filepath} not present.")
+                        # reading image and label
+                        with Image.open(img_filepath) as img:
+                            self.imgs.append(np.array(img))
+                            self.labels.append(curr_label)
+#                         if contour:
+#                             try:
+                        # reading corresponding contours
+                        with Image.open(contour_filepath) as contour:
+                            self.contours.append(np.array(contour))
+#                             except:
+#                                 raise Exception(f"Reading contour enabled, but contour file: {contour_filepath} not present.")
 
     def show(self):
         pass
@@ -102,6 +103,7 @@ class FER_CKPLUS_Dataset(Dataset):
         with h5py.File(savepath, 'w') as hf:
             hf.create_dataset("imgs", data=self.imgs)
             hf.create_dataset("labels", data=self.labels)
+            hf.create_dataset("contours"， data=self.contours)
 
     def read_h5(self, filepath="./data/fer_ckplus.h5"):
         """
@@ -111,15 +113,22 @@ class FER_CKPLUS_Dataset(Dataset):
         with h5py.File(filepath, 'r') as hf:
             self.imgs = hf['imgs'][:]
             self.labels = hf['labels'][:]
-
+            self.contours = hf['contours'][:]
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, idx):
         img = self.imgs[idx]
+        contour = self.contours[idx]
         label = self.labels[idx]
         img = self.transform(img)
-        return img ,label
+        contour = self.transform(contour)
+        height = img.shape[0]
+        width = img.shape[1]
+        combine = np.zeros((height, width, 2))
+        combine[:,:,0]=img
+        combine[:,:,1]= contour
+        return combine, label 
 
         
 
