@@ -185,7 +185,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
 if __name__ == "__main__":
     # choose dataset based on args config
     dataset = choose_dataset(args)
-    print(dataset)
+    print(len(dataset))
     try:
         img_size = dataset[0][0].detach().numpy().shape[1:]   # 2d image size (48x48) or (224x224)
     except:
