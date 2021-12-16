@@ -26,7 +26,7 @@ parser.add_argument('-d', '--data', type=str, default='/content/gdrive/MyDrive/C
                                 FER2013: folder path that contains csv that downloaded from kaggle (icml_face_data.csv)\n\
                                 FER_CKPLUS: folder path that contains 8 subfolders\n\
                                 CK_PLUS: folder path that contains 7 subfolders')
-parser.add_argument('-ds', '--dataset', type=str, default='CK_PLUS', help='choice of \{FER2013, FER_CKPLUS, CK_PLUS\}')
+parser.add_argument('-ds', '--dataset', type=str, default='CK_PLUS', help='choice of \{FER2013, FER_CKPLUS, CK_PLUS, CK_PLUS_CONTOUR\}')
 
 # model arch settings
 parser.add_argument('-m', '--model', type=str, default='de', help='DL model to run, can only be one of {de, de224, vgg, simple}')
