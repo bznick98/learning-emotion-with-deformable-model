@@ -103,7 +103,7 @@ class FER_CKPLUS_Dataset(Dataset):
         with h5py.File(savepath, 'w') as hf:
             hf.create_dataset("imgs", data=self.imgs)
             hf.create_dataset("labels", data=self.labels)
-            hf.create_dataset("contours"， data=self.contours)
+            hf.create_dataset("contours", data=self.contours)
 
     def read_h5(self, filepath="./data/fer_ckplus.h5"):
         """
