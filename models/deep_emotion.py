@@ -137,7 +137,7 @@ class Deep_Emotion(nn.Module):
 
 
 class Deep_Emotion224(nn.Module):
-    def __init__(self, de_conv=False, drop=0, n_drop=1):
+    def __init__(self, de_conv=False, drop=0, n_drop=1, contour=False):
         '''
         Deep_Emotion, designed for 224x224 input, channels are wider than baseline Deep_Emotion
         input: (NxCx224x224)
@@ -149,7 +149,11 @@ class Deep_Emotion224(nn.Module):
         self.de_conv = de_conv
         self.n_drop = n_drop
 
-        self.conv1 = nn.Conv2d(1,32,3)      # 222x222x32
+        contour = True # TODO: HARDCODE FOR NOW, MOVE TO ARGS LATER
+        input_channel = 1
+        if contour: input_channel = 2
+
+        self.conv1 = nn.Conv2d(input_channel,32,3)      # 222x222x32
         self.bn1 = nn.BatchNorm2d(32)     
         self.conv2 = nn.Conv2d(32,32,3)     # 220x220x32
         self.bn2 = nn.BatchNorm2d(32)     
@@ -190,7 +194,7 @@ class Deep_Emotion224(nn.Module):
 
         # STN & localization network
         self.localization = nn.Sequential(
-            nn.Conv2d(1, 8, kernel_size=7),     # 42x42xch  /   # 218x218xch
+            nn.Conv2d(input_channel, 8, kernel_size=7),     # 42x42xch  /   # 218x218xch
             nn.MaxPool2d(2, stride=2),          # 21x21xch  /   # 109x109xch
             nn.ReLU(True),
             nn.Conv2d(8, 10, kernel_size=5),    # 16x16xch  /   # 104x104xch
@@ -263,7 +267,7 @@ class Deep_Emotion224(nn.Module):
 # ONLY FOR TESTING
 if __name__ == "__main__":
     net = Deep_Emotion224(de_conv=False)
-    x = torch.ones((16,1,224,224))
+    x = torch.ones((16,2,224,224))
     out = net(x)
     print(f"Input shape: {x.shape}")
     print(f"Output shape: {out.shape}")
