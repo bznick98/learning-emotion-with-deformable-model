@@ -79,7 +79,7 @@ def train_kfold(net, epochs, dataset, batch_size, lr, wd, k=10, input_size=(224,
     max_train_acc_kfolds = []
     max_val_acc_kfolds = []
 
-    summary(net, input_size=(batch_size, 1, input_size[0], input_size[1]), verbose=1)
+    summary(net, input_size=(batch_size, 2, input_size[0], input_size[1]), verbose=1)
     
     # convert list to Compose functinos
     augmentations = transforms.Compose(augmentations)
