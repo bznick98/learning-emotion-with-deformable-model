@@ -143,6 +143,7 @@ class FER_CKPLUS_Dataset(Dataset):
         # combine[:,:,0]=img
         # combine[:,:,1]= contour
         combined = torch.concat((img, contour))
+        print(combined.shape)
         return combined, label 
 
         
